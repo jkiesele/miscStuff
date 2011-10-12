@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Oct 10 14:37:26 2011 by ROOT version 5.27/06b
+// Wed Oct 12 14:43:17 2011 by ROOT version 5.27/06b
 // from TTree NTuple/NTuple
-// found on file: /scratch/hh/current/cms/user/kieseler/Tuples_0610/ee_Full.root
+// found on file: dcap://dcache-cms-dcap.desy.de//pnfs/desy.de/cms/tier2/store/user/jkiesele/Trees/mumu_1fb.root
 //////////////////////////////////////////////////////////
 
-#ifndef EE_Analysis_h
-#define EE_Analysis_h
+#ifndef MuMu_Analysis_h
+#define MuMu_Analysis_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -20,7 +20,7 @@
 #include <TString.h>
 #include <TH1.h>
 
-class EE_Analysis : public TSelector {
+class MuMu_Analysis : public TSelector {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
 
@@ -78,8 +78,8 @@ public :
    TBranch        *b_PUweight;   //!
    TBranch        *b_vertMulti;   //!
 
-   EE_Analysis(TTree * /*tree*/ =0) { }
-   virtual ~EE_Analysis() { }
+   MuMu_Analysis(TTree * /*tree*/ =0) { }
+   virtual ~MuMu_Analysis() { }
    virtual Int_t   Version() const { return 2; }
    virtual void    Begin(TTree *tree);
    virtual void    SlaveBegin(TTree *tree);
@@ -123,21 +123,17 @@ public :
    double testcounter;
 
 
-   TH1D *h_dataZEC;
-   TH1D *h_MCZEC;
-   TH1D *h_dataZB;
-   TH1D *h_MCZB;
-
    TH1D rescaleVert_h;
 
-   //////////////
-   ClassDef(EE_Analysis,0);
+
+   ////////
+   ClassDef(MuMu_Analysis,0);
 };
 
 #endif
 
-#ifdef EE_Analysis_cxx
-void EE_Analysis::Init(TTree *tree)
+#ifdef MuMu_Analysis_cxx
+void MuMu_Analysis::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -199,7 +195,7 @@ void EE_Analysis::Init(TTree *tree)
    fChain->SetBranchAddress("vertMulti", &vertMulti, &b_vertMulti);
 }
 
-Bool_t EE_Analysis::Notify()
+Bool_t MuMu_Analysis::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -209,7 +205,7 @@ Bool_t EE_Analysis::Notify()
 
    return kTRUE;
 }
-void EE_Analysis::GetAllBranches(Long64_t & entry)
+void MuMu_Analysis::GetAllBranches(Long64_t & entry)
 {
 
            b_lepPt->GetEntry(entry);   //!
@@ -238,4 +234,4 @@ void EE_Analysis::GetAllBranches(Long64_t & entry)
            b_PUweight->GetEntry(entry);   //!
            b_vertMulti->GetEntry(entry);   //!
 }
-#endif // #ifdef EE_Analysis_cxx
+#endif // #ifdef MuMu_Analysis_cxx

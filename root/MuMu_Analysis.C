@@ -1,35 +1,27 @@
-#define EE_Analysis_cxx
+#define MuMu_Analysis_cxx
 
 
-#include "EE_Analysis.h"
+#include "MuMu_Analysis.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include "TLorentzVector.h"
 #include "plugins/rescaleFunctions.h"
 
 
-void EE_Analysis::Begin(TTree * /*tree*/)
+void MuMu_Analysis::Begin(TTree * /*tree*/)
 {
-  totalEventCount=0;
+
    TString option = GetOption();
+  totalEventCount=0;
 
    ///init counters
-   TString dataset="ee";
+   TString dataset="mumu";
 
-   rescaleVert_h = readin("EE_Analysis_Rescaler.root", "vertMulti3R");
+   // rescaleVert_h = readin("MuMu_Analysis_Rescaler.root", "vertMulti3R");
 
-//    TCanvas * c = new TCanvas("","");
-//    c->cd();
-//    rescaleVert_h.Draw();
-//    c->Print("test.ps");
 
-   h_dataZEC = new TH1D("ZpeakEC", "ZPeakEC", 300, 60, 120);
-   h_MCZEC = new TH1D("ZpeakMCEC", "ZPeakMCEC", 300, 60, 120);
-   h_dataZB = new TH1D("ZpeakB", "ZPeakB", 300, 60, 120);
-   h_MCZB = new TH1D("ZpeakMCB", "ZPeakMCB", 300, 60, 120);
-
-   c_step0.setDataSet(dataset);
    c_step0.setOptions("c_step0 after 1 iso", 1);
+   c_step0.setDataSet(dataset);
    c_step1.setDataSet(dataset);
    c_step1.setOptions("c_step1 after charge", 1);
    c_step2.setDataSet(dataset);
@@ -239,10 +231,9 @@ h_vertMulti3a.   setOptions("vertMulti3a", "N_{vertex}", "N_{evts}", 30, 0, 30, 
 
    testcounter=0;
 
-
 }
 
-void EE_Analysis::SlaveBegin(TTree * /*tree*/)
+void MuMu_Analysis::SlaveBegin(TTree * /*tree*/)
 {
    // The SlaveBegin() function is called after the Begin() function.
    // When running with PROOF SlaveBegin() is called on each slave server.
@@ -252,14 +243,14 @@ void EE_Analysis::SlaveBegin(TTree * /*tree*/)
 
 }
 
-Bool_t EE_Analysis::Process(Long64_t entry)
+Bool_t MuMu_Analysis::Process(Long64_t entry)
 {
 
   GetAllBranches(entry);
 
 
   totalEventCount++;
-  double totalevents=8.125e+06;
+  double totalevents=9.66875e+06;
   if((int)(100*totalEventCount)%(int)(totalevents) ==0) std::cout << totalEventCount << "\t\tEvents processed \tca. " << (int) totalEventCount/totalevents* 100 << "%" << std::endl;
 
   TString DataType;  
@@ -286,7 +277,7 @@ Bool_t EE_Analysis::Process(Long64_t entry)
   float isocutmuons = 999999;//0.3;//0.2; //0.2;  //0.2;//0.2; pf // 0.15 comb
   float isocutelecs = 999999; //0.3;//0.17;//0.17; //0.17; //0.17;//0.17;
   bool pfIso = true;
-  float leptontype = -1; // 1 muon -1 electron
+  float leptontype = 1; // 1 muon -1 electron
   bool oppocharge=true;
   float globalElecEnergyScale=1.0;
   //if(DataType == "ee_200rereco.root" || DataType == "ee_800prompt.root" ) globalElecEnergyScale=1.005; //just play around
@@ -387,21 +378,7 @@ Bool_t EE_Analysis::Process(Long64_t entry)
   if(btagmulti > 0) b_step8=true;
   if(btagmultiM > 0) b_step9=true;
 
-  //histos for lep energy scale
 
-
-  if(b_step1 && b_step2 && b_step3){
-    if(DataType=="ee_200rereco.root" || DataType=="ee_800prompt.root"){
-      if(VLepEta[0] > 1.479 && VLepEta[1] > 1.479)  h_dataZEC->Fill(dimass, PUweight);
-      if(VLepEta[0] < 1.479 && VLepEta[1] < 1.479)  h_dataZB->Fill(dimass, PUweight);
-    }
-
-    else if((DataType=="ee_dyee50inf.root")){
-      if(VLepEta[0] > 1.479 && VLepEta[1] > 1.479)  h_MCZEC->Fill(dimass, PUweight);
-      if(VLepEta[0] < 1.479 && VLepEta[1] < 1.479)  h_MCZB->Fill(dimass, PUweight);
-    }
-
-  }
 
 
   //Fill the histograms etc apart from step 0 (this is filled at the top
@@ -420,7 +397,7 @@ Bool_t EE_Analysis::Process(Long64_t entry)
   
 
   //  if(!isData) std::cout << PUweight << std::endl;
-  if(!isData) PUweight = PUweight * reweightWeight(rescaleVert_h, vertMulti);
+  //if(!isData) PUweight = PUweight * reweightWeight(rescaleVert_h, vertMulti);
   //  if(!isData) std::cout << PUweight << '\n' << std::endl;
 
 
@@ -544,10 +521,12 @@ Bool_t EE_Analysis::Process(Long64_t entry)
   }
 
 
+
+
    return kTRUE;
 }
 
-void EE_Analysis::SlaveTerminate()
+void MuMu_Analysis::SlaveTerminate()
 {
    // The SlaveTerminate() function is called after all entries or objects
    // have been processed. When running with PROOF SlaveTerminate() is called
@@ -555,17 +534,16 @@ void EE_Analysis::SlaveTerminate()
 
 }
 
-void EE_Analysis::Terminate()
+void MuMu_Analysis::Terminate()
 {
+   // The Terminate() function is the last function to be called during
+   // a query. It always runs on the client, it can be used to present
+   // the results graphically or save the results to file.
 
 
  
-  TFile *f = new TFile("EE_Analysis_reweighted.root","RECREATE");
+  TFile *f = new TFile("MuMu_Analysis.root","RECREATE");
 
-  h_dataZEC->Write();
-  h_dataZB->Write();
-  h_MCZEC->Write();
-  h_MCZB->Write();
 
 h_testplotter.write();
 h_testplotter2.write();
@@ -674,11 +652,13 @@ h_testplotter2.write();
   f->Close();
 
 
-//   TFile *f2 = new TFile("EE_Analysis_Rescaler.root","RECREATE");
+  TFile *f2 = new TFile("MuMu_Analysis_Rescaler.root","RECREATE");
 
-//   h_vertMulti3.writeRescaleHisto("vertMulti3R");
-//   h_vertMulti3a.writeRescaleHisto("vertMulti3aR");
+  h_vertMulti3.writeRescaleHisto("vertMulti3R");
+  h_vertMulti3a.writeRescaleHisto("vertMulti3aR");
 
-//   f2->Close();
+  f2->Close();
+
+
 
 }

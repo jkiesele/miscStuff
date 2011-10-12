@@ -19,6 +19,32 @@ TH1D  readin(TString filename, TString histname)
   //delete f;
   return h;
 }
+TH1D  readinErrorsUp(TString filename, TString histname)
+{
+  TFile f = TFile(filename);
+  TH1D  h1 = *((TH1D*)(f.Get(histname)));
+  TH1D  h2 = *((TH1D*)(f.Get(histname)));
+
+  for(int i=1; i<h1.GetNbins(); i++){
+    h2.SetBinContent(i, h1.GetBinContent(i) + h1.GetBinError(i);
+  }
+
+  //delete f;
+  return h2;
+}
+TH1D  readinErrorsDown(TString filename, TString histname)
+{
+  TFile f = TFile(filename);
+  TH1D  h1 = *((TH1D*)(f.Get(histname)));
+  TH1D  h2 = *((TH1D*)(f.Get(histname)));
+
+  for(int i=1; i<h1.GetNbins(); i++){
+    h2.SetBinContent(i, h1.GetBinContent(i) - h1.GetBinError(i);
+  }
+
+  //delete f;
+  return h2;
+}
 
 TH2D  readin2D(TString filename, TString histname)
 {
