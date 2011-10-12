@@ -22,6 +22,7 @@ public:
   double coutNsig(TString);
   void fill(TString, float);
   void fill(TString, double);
+  bool isData(TString);
   std::vector<double> getEff(TString, std::vector<double>, std::vector<double>);
 
 
@@ -400,7 +401,18 @@ void CountTools::setDataSet(TString mode)
 
 }
 
+bool CountTools::isData(TString datatype)
+{
+  bool isdata=false;
+  for(unsigned int i=0; i< legends.size(); i++){
+    if(datatype == dataset[i]){
+      if ("data" == legends[i])       isdata=true;
+      break;
+    }
+  }
 
+  return isdata;
+}
 
 
 
