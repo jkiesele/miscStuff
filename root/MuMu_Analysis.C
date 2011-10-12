@@ -17,7 +17,7 @@ void MuMu_Analysis::Begin(TTree * /*tree*/)
    ///init counters
    TString dataset="mumu";
 
-   // rescaleVert_h = readin("MuMu_Analysis_Rescaler.root", "vertMulti3R");
+   rescaleVert_h = readinErrorsDown("EE_Analysis_Rescaler.root", "vertMulti3R");
 
 
    c_step0.setOptions("c_step0 after 1 iso", 1);
