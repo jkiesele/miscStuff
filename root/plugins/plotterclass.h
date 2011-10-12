@@ -348,6 +348,144 @@ void Plotter::setDataSet(TString mode)
   legends.push_back("QCD");
   colors.push_back(kYellow);
   }
+  if(mode == "emu"){
+
+
+  dataset.clear();
+  scales.clear();
+  legends.clear();
+  colors.clear();
+
+
+
+  dataset.push_back("emu_200rereco.root");
+  scales.push_back(1);
+  legends.push_back("data");
+  colors.push_back(kBlack);
+
+  dataset.push_back("emu_800prompt.root");
+  scales.push_back(1);
+  legends.push_back("data");
+  colors.push_back(kBlack);
+
+  dataset.push_back("emu_run161119.root");
+  scales.push_back(1);
+  legends.push_back("data");
+  colors.push_back(kBlack);
+
+  dataset.push_back("emu_ttbarsignal.root");
+  scales.push_back(Lumi*157.5/3581947.);
+  legends.push_back("t#bar{t} signal");
+  colors.push_back(kRed+1);
+
+  dataset.push_back("emu_ttbarviatau.root");
+  scales.push_back(Lumi*157.5/3581947.);
+  legends.push_back("t#bar{t} signal");
+  colors.push_back(kRed+1);
+
+  dataset.push_back("emu_ttbarbg.root");
+  scales.push_back(Lumi*157.5/3581947.);
+  legends.push_back("t#bar{t} background");
+  colors.push_back(kRed+2);
+
+  dataset.push_back("emu_singletop_tw.root");
+  scales.push_back(Lumi*5.3/814390.);
+  legends.push_back("tW");
+  colors.push_back(kMagenta);
+
+  dataset.push_back("emu_singleantitop_tw.root");
+  scales.push_back(Lumi*5.3/809984.);
+  legends.push_back("tW");
+  colors.push_back(kMagenta);
+
+  dataset.push_back("emu_wwto2l2nu.root");
+  scales.push_back(Lumi*4.51/210667.);
+  legends.push_back("VV");
+  colors.push_back(kYellow-10);
+
+  dataset.push_back("emu_wzto3lnu.root");
+  scales.push_back(Lumi*0.61/204725.);
+  legends.push_back("VV");
+  colors.push_back(kYellow-10);
+
+  dataset.push_back("emu_zztoall.root");
+  scales.push_back(Lumi*7.4/4187885.);
+  legends.push_back("VV");
+  colors.push_back(kYellow-10);
+
+  dataset.push_back("emu_dytautau1020.root");
+  scales.push_back(Lumi*3457./2200000.);
+  legends.push_back("Z^{0} / #gamma* #rightarrow #tau#tau");
+  colors.push_back(kAzure+8);
+
+  dataset.push_back("emu_dytautau2050.root");
+  scales.push_back(Lumi*1666./2032536.);
+  legends.push_back("Z^{0} / #gamma* #rightarrow #tau#tau");
+  colors.push_back(kAzure+8);
+
+  dataset.push_back("emu_dytautau50inf.root");
+  scales.push_back(Lumi*3048./35101516);
+  legends.push_back("Z^{0} / #gamma* #rightarrow #tau#tau");
+  colors.push_back(kAzure+8);
+
+  dataset.push_back("emu_dyee1020.root");
+  scales.push_back(Lumi*3457./2121872.);
+  legends.push_back("Z^{0} / #gamma* #rightarrow ll");
+  colors.push_back(kAzure-2);
+
+  dataset.push_back("emu_dyee2050.root");
+  scales.push_back(Lumi*1666./2254925.);
+  legends.push_back("Z^{0} / #gamma* #rightarrow ll");
+  colors.push_back(kAzure-2);
+
+  dataset.push_back("emu_dyee50inf.root");
+  scales.push_back(Lumi*3048./35101516.);
+  legends.push_back("Z^{0} / #gamma* #rightarrow ll");
+  colors.push_back(kAzure-2);
+
+  dataset.push_back("mumu_dymumu1020.root");
+  scales.push_back(Lumi*3457./2121872);
+  legends.push_back("Z^{0} / #gamma* #rightarrow ll");
+  colors.push_back(kAzure-2);
+
+  dataset.push_back("mumu_dymumu2050.root");
+  scales.push_back(Lumi*1666./2254925);
+  legends.push_back("Z^{0} / #gamma* #rightarrow ll");
+  colors.push_back(kAzure-2);
+
+  dataset.push_back("mumu_dymumu50inf.root");
+  scales.push_back(Lumi*3048./35101516);
+  legends.push_back("Z^{0} / #gamma* #rightarrow ll");
+  colors.push_back(kAzure-2);
+
+  dataset.push_back("emu_wtolnu.root");
+  scales.push_back(Lumi*31314./56789563.);
+  legends.push_back("W #rightarrow ll");
+  colors.push_back(kGreen-3);
+
+  dataset.push_back("emu_qcdem2030.root");
+  scales.push_back(Lumi*2.361E8 * 0.0106 /35729669.);
+  legends.push_back("QCD");
+  colors.push_back(kYellow);
+
+  dataset.push_back("emu_qcdem3080.root");
+  scales.push_back(Lumi*5.944E7 * 0.061/70392060.);
+  legends.push_back("QCD");
+  colors.push_back(kYellow);
+
+  dataset.push_back("emu_qcdem80170.root");
+  scales.push_back(Lumi*898200.0*0.159/8150672.);
+  legends.push_back("QCD");
+  colors.push_back(kYellow);
+
+  dataset.push_back("emu_qcdmu15.root");
+  scales.push_back(Lumi*2.966E8*2.855E-4 /20258122);
+  legends.push_back("QCD");
+  colors.push_back(kYellow);
+
+
+
+  }
 
 
 }
