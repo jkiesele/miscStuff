@@ -25,8 +25,8 @@ TH1D  readinErrorsUp(TString filename, TString histname)
   TH1D  h1 = *((TH1D*)(f.Get(histname)));
   TH1D  h2 = *((TH1D*)(f.Get(histname)));
 
-  for(int i=1; i<h1.GetNbins(); i++){
-    h2.SetBinContent(i, h1.GetBinContent(i) + h1.GetBinError(i);
+  for(int i=1; i<h1.GetNbinsX()+1; i++){
+    h2.SetBinContent(i, h1.GetBinContent(i) + h1.GetBinError(i));
   }
 
   //delete f;
@@ -38,8 +38,8 @@ TH1D  readinErrorsDown(TString filename, TString histname)
   TH1D  h1 = *((TH1D*)(f.Get(histname)));
   TH1D  h2 = *((TH1D*)(f.Get(histname)));
 
-  for(int i=1; i<h1.GetNbins(); i++){
-    h2.SetBinContent(i, h1.GetBinContent(i) - h1.GetBinError(i);
+  for(int i=1; i<h1.GetNbinsX()+1; i++){
+    h2.SetBinContent(i, h1.GetBinContent(i) - h1.GetBinError(i));
   }
 
   //delete f;
