@@ -35,7 +35,8 @@ class Plotter {
 
   void setStyle(TH1F&, unsigned int);
   void   write();
-  void writeRescaleHisto(TString, std::vector<TString> );
+  void writeRescaleHisto(TString, std::vector<TString> ); //for specific samples
+  void writeRescaleHisto(TString);                        //for all MC
 
 
  private:
@@ -525,7 +526,34 @@ void Plotter::writeRescaleHisto(TString histname, std::vector<TString> samples)
   else std::cout << "Histogram " << title << " not filled during the process." << std::endl;
 
 }
+void Plotter::writeRescaleHisto(TString histname)
+{
 
+  if(initialized && hists.size()>0){
+    TH1F h = hists[0];
+    h.SetName(histname);
+    h.SetTitle(histname);
+
+    std::vector<TString> samples=dataset;
+
+    for(int binIter=1; binIter<hists[0].GetNbinsX()+1; binIter++){
+      float nMC=0;
+      float nData=0;
+
+      for(unsigned int i=0; i<hists.size() ; i++){
+	if(legends[i] == "data") nData=nData +  hists[i].GetBinContent(binIter);
+	else                     nMC=nMC + scales[i] * hists[i].GetBinContent(binIter);
+	
+      }
+      if(nMC!=0) h.SetBinContent(binIter, (nData/nMC));
+      else       h.SetBinContent(binIter, 1);
+      std::cout << nData << " d  " << nMC << " MC  in bin " << binIter << std::endl;
+    }
+    h.Write();
+  }
+  else std::cout << "Histogram " << title << " not filled during the process." << std::endl;
+
+}
 // void plotterclass(){ /////just for testing!!!!
 
 //   TFile *f = new TFile("test.root", "RECREATE");
