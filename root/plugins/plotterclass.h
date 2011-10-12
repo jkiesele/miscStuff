@@ -545,8 +545,8 @@ void Plotter::writeRescaleHisto(TString histname)
 	else                     nMC=nMC + scales[i] * hists[i].GetBinContent(binIter);
 	
       }
-      if(nMC!=0) h.SetBinContent(binIter, (nData/nMC));
-      else       h.SetBinContent(binIter, 1);
+      if(nMC!=0 && nData!=0) h.SetBinContent(binIter, (nData/nMC));
+      else                   h.SetBinContent(binIter, 1);
       std::cout << nData << " d  " << nMC << " MC  in bin " << binIter << std::endl;
     }
     h.Write();
