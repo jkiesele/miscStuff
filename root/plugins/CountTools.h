@@ -124,7 +124,10 @@ std::vector<double> CountTools::getNs(){
 
     numberhelper=numbers[i]*scalehelper+numberhelper;
 
-    if(!(legends[i+1]) || legends[i] != legends[i+1]){
+    if(i+1 < legends.size() && legends[i] != legends[i+1]){
+      numberhelper=0;
+    }
+    else if(i+1 == legends.size()){
       numberhelper=0;
     }
   }
@@ -133,7 +136,7 @@ std::vector<double> CountTools::getNs(){
     std::vector<double> vec;
     vec.push_back(0);
     return vec;
-   }
+  }
 
 }
 
@@ -150,18 +153,23 @@ std::vector<double> CountTools::coutNs(){
 
     numberhelper=numbers[i]*scalehelper+numberhelper;
 
-    if(!(legends[i+1]) || legends[i] != legends[i+1]){
+    if(i+1 < legends.size() && legends[i] != legends[i+1]){
       std::cout << legends[i] << "   " << numberhelper << std::endl;
       numberhelper=0;
     }
-  }  
+    else if(i+1 == legends.size()){
+      std::cout << legends[i] << "   " << numberhelper << std::endl;
+      numberhelper=0;
+    }
+  }
+  
 
   if(numbers.size()>0) return numbers;
   else{
     std::vector<double> vec;
     vec.push_back(0);
     return vec;
-   }
+  }
 
 }
 
