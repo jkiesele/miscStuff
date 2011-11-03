@@ -19,12 +19,14 @@ public:
   std::vector<double> getNs();
   std::vector<double> coutNs();
   double getNsig(TString);
+  double getNsig(std::vector<TString>);
   double coutNsig(TString);
+  double coutNsig(std::vector<TString>);
   void fill(TString, float);
   void fill(TString, double);
   bool isData(TString);
-  std::vector<double> getEff(TString, std::vector<double>, std::vector<double>);
-
+  double getEff(std::vector<TString>, double);
+  void setLumi(double);
 
 private:
 
@@ -37,6 +39,7 @@ private:
   double DYScale;
   TString DYEntry;
   TString name;
+  double Lumi;
 
 };
 
@@ -47,6 +50,8 @@ private:
 
 CountTools::CountTools()
 {
+
+  Lumi=1141;
   setDataSet("ee");
   numbers.clear();
   for(unsigned int i=0;  i < dataset.size(); i++){
@@ -60,22 +65,30 @@ CountTools::~CountTools()
 
 }
 
+void CountTools::setLumi(double lumi){
+  Lumi=lumi;
+}
 
-std::vector<double> CountTools::getEff(TString name_, std::vector<double> start, std::vector<double> end)
-{
-  std::vector<double> effs;
-  std::cout  << '\n' << name_ << std::endl;
-  for(unsigned int i=0; i< start.size() && i< end.size() && i< legends.size(); i++){
-    if(start[i]!=0){
-    std::cout << "Efficiency for " << legends[i] << ": " << end[i]/start[i] << std::endl;
-    effs.push_back(end[i]/start[i]);
+
+
+
+double CountTools::getEff(std::vector<TString> datasets, double startEvts){
+
+  double MCsum=0.;
+  for(unsigned int j=0; j < numbers.size(); j++){
+    bool isSignalMC=false;
+    for(unsigned int i = 0; i< datasets.size() ; i++){
+      if(dataset[j] == datasets[i]) isSignalMC=true;
     }
-    else effs.push_back(-1);
+    if(isSignalMC && legends[j] != "data") MCsum=MCsum + numbers[j];
+
+
   }
 
-  return effs;
+  return MCsum/startEvts;
 
 }
+
 
 
 
@@ -202,13 +215,50 @@ double CountTools::coutNsig(TString nameSig){
   return  DataSum-MCsum;
 }
 
+double CountTools::coutNsig(std::vector<TString> datasets){
+  
+  double MCsum=0.;
+  double DataSum=0.;
+  for(unsigned int j=0; j < numbers.size(); j++){
+    bool isSignalMC=false;
+    for(unsigned int i = 0; i< datasets.size() ; i++){
+      if(dataset[j] == datasets[i]) isSignalMC=true;
+    }
+    if(!isSignalMC && legends[j] != "data") MCsum=MCsum + numbers[j]*scales[j];
+    else if(legends[j] == "data")           DataSum=DataSum+numbers[j]*scales[j];
+
+
+  }
+
+  std::cout << "\nnumber of Signal Events " << name << " " << DataSum-MCsum << std::endl;
+  return DataSum-MCsum;;
+
+}
+
+double CountTools::getNsig(std::vector<TString> datasets){
+
+  double MCsum=0.;
+  double DataSum=0.;
+  for(unsigned int j=0; j < numbers.size(); j++){
+    bool isSignalMC=false;
+    for(unsigned int i = 0; i< datasets.size() ; i++){
+      if(dataset[j] == datasets[i]) isSignalMC=true;
+    }
+    if(!isSignalMC && legends[j] != "data") MCsum=MCsum + numbers[j]*scales[j];
+    else if(legends[j] == "data")           DataSum=DataSum+numbers[j]*scales[j];
+
+
+  }
+
+  return DataSum-MCsum;;
+
+}
 
 
 void CountTools::setDataSet(TString mode)
 {
 
 
-  double Lumi=1141;
 
 
 
