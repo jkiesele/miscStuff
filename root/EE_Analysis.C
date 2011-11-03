@@ -7,6 +7,7 @@
 #include "TLorentzVector.h"
 #include "plugins/rescaleFunctions.h"
 
+#include <fstream>
 
 void EE_Analysis::Begin(TTree * /*tree*/)
 {
@@ -16,17 +17,19 @@ void EE_Analysis::Begin(TTree * /*tree*/)
    ///init counters
    TString dataset="ee";
 
-   rescaleVert_h = readin("EE_Analysis_Rescaler.root", "vertMulti3R");
+   //rescaleVert_h = readin("EE_Analysis_Rescaler.root", "vertMulti3R");
 
 //    TCanvas * c = new TCanvas("","");
 //    c->cd();
 //    rescaleVert_h.Draw();
 //    c->Print("test.ps");
 
-   h_dataZEC = new TH1D("ZpeakEC", "ZPeakEC", 300, 60, 120);
+   //dimassRescale_h =  readin("EE_Analysis_Rescaler.root", "dimass3R");
+
+   h_dataZEC = new TH1D("ZpeakEC", "ZPeakEC", 200, 60, 120);
    h_MCZEC = new TH1D("ZpeakMCEC", "ZPeakMCEC", 300, 60, 120);
-   h_dataZB = new TH1D("ZpeakB", "ZPeakB", 300, 60, 120);
-   h_MCZB = new TH1D("ZpeakMCB", "ZPeakMCB", 300, 60, 120);
+   h_dataZB = new TH1D("ZpeakB", "ZPeakB", 600, 60, 120);
+   h_MCZB = new TH1D("ZpeakMCB", "ZPeakMCB", 900, 60, 120);
 
    c_step0.setDataSet(dataset);
    c_step0.setOptions("c_step0 after 1 iso", 1);
@@ -268,7 +271,7 @@ Bool_t EE_Analysis::Process(Long64_t entry)
 
   bool isData=c_step0.isData(DataType);
 
- 
+  bool reweight=false;
 
   bool b_step1=false; 
   bool b_step2=false; 
@@ -294,7 +297,7 @@ Bool_t EE_Analysis::Process(Long64_t entry)
   float tempiso=100;
 
   std::vector<float> VLepPt;
-  std::vector<float> VLepEta, VLepPhi, VLepE, VLepPx, VLepPy, VLepPz, VLepPfIso, VLepCombIso;
+  std::vector<double> VLepEta, VLepPhi, VLepE, VLepPx, VLepPy, VLepPz, VLepPfIso, VLepCombIso;
   std::vector<int> VLepQ, VLepType;
  
 
@@ -420,11 +423,26 @@ Bool_t EE_Analysis::Process(Long64_t entry)
   
 
   //  if(!isData) std::cout << PUweight << std::endl;
-  if(!isData) PUweight = PUweight * reweightWeight(rescaleVert_h, vertMulti);
+  //if(!isData) PUweight = PUweight * reweightWeight(dimassRescale_h, dimass);
   //  if(!isData) std::cout << PUweight << '\n' << std::endl;
 
 
 
+
+//   if(reweight && !isData && b_step3 && dimass<50){
+//     std::vector<TString> samples;
+//     samples.push_back("ee_dyee1020.root");
+//     samples.push_back("ee_dyee2050.root");
+//     samples.push_back("ee_dyee50inf.root");
+
+//     for (unsigned int i = 0; i< samples.size(); i++){
+//       if(DataType == samples[i]){
+// 	PUweight = PUweight * reweightWeight(dimassRescale_h, dimass);
+// 	break;
+//       }
+
+//     }
+//   }
 
   if(b_step1 && b_step2 && b_step3){
     c_step3.fill(DataType, PUweight);
@@ -560,7 +578,7 @@ void EE_Analysis::Terminate()
 
 
  
-  TFile *f = new TFile("EE_Analysis_reweighted.root","RECREATE");
+  TFile *f = new TFile("EE_DEFAULTOUT.root","RECREATE");
 
   h_dataZEC->Write();
   h_dataZB->Write();
@@ -652,6 +670,24 @@ h_testplotter2.write();
   h_diMassZ8.  write();
 
 
+ std::vector<TString> DYsamples;
+ //DYsamples.push_back("ee_dyee1020.root");
+  //DYsamples.push_back("ee_dyee2050.root");
+  DYsamples.push_back("ee_dyee50inf.root");
+
+
+ std::vector<TString> Zsamples;
+  Zsamples.push_back("ee_Zee.root");
+
+
+ std::vector<TString> ttsamples;
+  ttsamples.push_back("ee_ttbarsignal.root");
+  ttsamples.push_back("ee_ttbarviatau.root");
+
+ std::vector<TString> ttviatausamples;
+  ttviatausamples.push_back("ee_ttbarviatau.root");
+
+
   c_step0.coutNs();
 
   c_step1.coutNs();
@@ -668,17 +704,42 @@ h_testplotter2.write();
   c_step9.coutNs();
   c_step9.coutNsig("t#bar{t} signal");
 
+  double Lumi=1141;
 
-  std::cout << testcounter << std::endl;
+
+ ///!!!!!!!NOT finished!!!just a test
+  double Zeff=  c_step3.getEff(DYsamples, 11270427);
+  double tteff = c_step8.getEff(ttsamples, 44616+17580);
+  std::cout << "tt Eff"  << tteff <<std::endl;
+  std::cout << "Z Eff"  << Zeff <<std::endl;           
+  std::cout << "fract ZEff/tteff"  << Zeff/tteff <<std::endl;   
+
+  // std::cout << testcounter << std::endl;
 
   f->Close();
 
+  double ttxsec=0;
+  double Zxsec=0;
 
-//   TFile *f2 = new TFile("EE_Analysis_Rescaler.root","RECREATE");
+  ofstream myfile;
+  myfile.open ("EE_out.txt", ios::out | ios::app);
+  myfile << "DEFAULT ttxsec: ";
+  myfile << ttxsec;
+  myfile << "\nDEFAULT Zxsec: ";
+  myfile << Zxsec;
 
-//   h_vertMulti3.writeRescaleHisto("vertMulti3R");
-//   h_vertMulti3a.writeRescaleHisto("vertMulti3aR");
+  myfile.close();
+  //////////
+  //replace DEFAULT per script with corrosponding sample and use DEFAULT_load_EE.C in root
+  // with root -q -l DEFAULT_load_EE.C ..
 
-//   f2->Close();
+//   TFile *f2 = new TFile("EE_Analysis_Rescaler.root","UPDATE");
+
+// //   h_vertMulti3.writeRescaleHisto("vertMulti3R");
+// //   h_vertMulti3a.writeRescaleHisto("vertMulti3aR");
+
+//   h_diMass3.writeRescaleHisto("dimass3R", samples);
+
+//    f2->Close();
 
 }
