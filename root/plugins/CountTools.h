@@ -16,8 +16,10 @@ public:
 
   void   setDataSet(TString);
   void   setOptions(TString, double);
+  TString getName();
   std::vector<double> getNs();
-  std::vector<double> coutNs();
+  std::vector<TString> getNames();
+  void coutNs();
   double getNsig(TString);
   double getNsig(std::vector<TString>);
   double coutNsig(TString);
@@ -69,7 +71,9 @@ void CountTools::setLumi(double lumi){
   Lumi=lumi;
 }
 
-
+TString CountTools::getName(){
+  return name;
+}
 
 
 double CountTools::getEff(std::vector<TString> datasets, double startEvts){
@@ -129,6 +133,7 @@ std::vector<double> CountTools::getNs(){
 
   double numberhelper=0.;
   double scalehelper;
+  std::vector<double> numbervec;
 
   //std::cout << '\n' << name << std::endl;
 
@@ -139,13 +144,15 @@ std::vector<double> CountTools::getNs(){
     numberhelper=numbers[i]*scalehelper+numberhelper;
 
     if(i+1 < legends.size() && legends[i] != legends[i+1]){
+      numbervec.push_back(numberhelper);
       numberhelper=0;
     }
     else if(i+1 == legends.size()){
+      numbervec.push_back(numberhelper);
       numberhelper=0;
     }
   }
-  if(numbers.size()>0) return numbers;
+  if(numbers.size()>0) return numbervec;
   else{
     std::vector<double> vec;
     vec.push_back(0);
@@ -154,7 +161,28 @@ std::vector<double> CountTools::getNs(){
 
 }
 
-std::vector<double> CountTools::coutNs(){
+
+std::vector<TString> CountTools::getNames(){
+
+
+    std::vector<TString> vec;
+
+  for(unsigned int i=0; i < numbers.size(); i++){
+
+
+    if(i+1 < legends.size() && legends[i] != legends[i+1]){
+      vec.push_back(legends[i]);
+    }
+    else if(i+1 == legends.size()){
+      vec.push_back(legends[i]);
+    }
+  }
+  
+  return vec;
+
+
+}
+void CountTools::coutNs(){
 
   double numberhelper=0.;
   double scalehelper;
@@ -176,14 +204,7 @@ std::vector<double> CountTools::coutNs(){
       numberhelper=0;
     }
   }
-  
 
-  if(numbers.size()>0) return numbers;
-  else{
-    std::vector<double> vec;
-    vec.push_back(0);
-    return vec;
-  }
 
 }
 
@@ -283,15 +304,15 @@ void CountTools::setDataSet(TString mode)
   legends.push_back("data");
 
   dataset.push_back("ee_ttbarsignal.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} signal");
 
   dataset.push_back("ee_ttbarviatau.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} signal");
 
   dataset.push_back("ee_ttbarbg.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} background");
 
   dataset.push_back("ee_singletop_tw.root");
@@ -379,15 +400,15 @@ void CountTools::setDataSet(TString mode)
   legends.push_back("data");
 
   dataset.push_back("mumu_ttbarsignal.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} signal");
 
   dataset.push_back("mumu_ttbarviatau.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} signal");
 
   dataset.push_back("mumu_ttbarbg.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} background");
 
   dataset.push_back("mumu_singletop_tw.root");
@@ -465,15 +486,15 @@ void CountTools::setDataSet(TString mode)
   legends.push_back("data");
 
   dataset.push_back("emu_ttbarsignal.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} signal");
 
   dataset.push_back("emu_ttbarviatau.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} signal");
 
   dataset.push_back("emu_ttbarbg.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} background");
 
   dataset.push_back("emu_singletop_tw.root");
