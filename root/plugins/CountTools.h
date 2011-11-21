@@ -541,15 +541,15 @@ void CountTools::setDataSet(TString mode)
   scales.push_back(Lumi*3048./35101516.);
   legends.push_back("Z^{0} / #gamma* #rightarrow ll");
 
-  dataset.push_back("mumu_dymumu1020.root");
+  dataset.push_back("emu_dymumu1020.root");
   scales.push_back(Lumi*3457./2121872);
   legends.push_back("Z^{0} / #gamma* #rightarrow ll");
 
-  dataset.push_back("mumu_dymumu2050.root");
+  dataset.push_back("emu_dymumu2050.root");
   scales.push_back(Lumi*1666./2254925);
   legends.push_back("Z^{0} / #gamma* #rightarrow ll");
 
-  dataset.push_back("mumu_dymumu50inf.root");
+  dataset.push_back("emu_dymumu50inf.root");
   scales.push_back(Lumi*3048./35101516);
   legends.push_back("Z^{0} / #gamma* #rightarrow ll");
 
