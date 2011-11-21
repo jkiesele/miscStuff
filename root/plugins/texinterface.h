@@ -10,7 +10,7 @@ void writeYieldTable(std::vector<CountTools> vec, TString filename){
     ofstream myfile;
     myfile.open (filename, ios::out | ios::app);
     for(unsigned int j = 0 ; j < vec.size() ; j++){
-      myfile << "  && \t";
+      myfile << "  & \t";
       myfile << (vec[j].getName());
     }
     myfile << " \\\\ \\hline\n";
@@ -21,7 +21,7 @@ void writeYieldTable(std::vector<CountTools> vec, TString filename){
       myfile << names[i];
       myfile << "$\t";
       for(unsigned int j = 0 ; j < vec.size() ; j++){
-	myfile << "  && \t";
+	myfile << "  & \t";
 	myfile << (vec[j].getNs())[i];
       }
       myfile << "  \\\\ \n";
@@ -29,13 +29,13 @@ void writeYieldTable(std::vector<CountTools> vec, TString filename){
     myfile << "\\hline\n";
     myfile << "MC sum ";
     for(unsigned int j = 0 ; j < vec.size() ; j++){
-      myfile << "  && \t";
+      myfile << "  & \t";
       myfile << (vec[j].getNsig("fg") + (vec[j].getNs())[0]);
     }
     myfile << "\\\\ \n";
     myfile << "$Data$\t";
     for(unsigned int j = 0 ; j < vec.size() ; j++){
-      myfile << "  && \t";
+      myfile << "  & \t";
       myfile << (vec[j].getNs())[0];
       myfile << "$\\pm$";
       myfile << sqrt((vec[j].getNs())[0]);
