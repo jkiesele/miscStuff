@@ -152,17 +152,17 @@ void Plotter::setDataSet(TString mode)
   colors.push_back(kBlack);
 
   dataset.push_back("ee_ttbarsignal.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} signal");
   colors.push_back(kRed+1);
 
   dataset.push_back("ee_ttbarviatau.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} signal");
   colors.push_back(kRed+1);
 
   dataset.push_back("ee_ttbarbg.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} background");
   colors.push_back(kRed+2);
 
@@ -269,17 +269,17 @@ void Plotter::setDataSet(TString mode)
   colors.push_back(kBlack);
 
   dataset.push_back("mumu_ttbarsignal.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} signal");
   colors.push_back(kRed+1);
 
   dataset.push_back("mumu_ttbarviatau.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} signal");
   colors.push_back(kRed+1);
 
   dataset.push_back("mumu_ttbarbg.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} background");
   colors.push_back(kRed+2);
 
@@ -374,17 +374,17 @@ void Plotter::setDataSet(TString mode)
   colors.push_back(kBlack);
 
   dataset.push_back("emu_ttbarsignal.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} signal");
   colors.push_back(kRed+1);
 
   dataset.push_back("emu_ttbarviatau.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} signal");
   colors.push_back(kRed+1);
 
   dataset.push_back("emu_ttbarbg.root");
-  scales.push_back(Lumi*157.5/3581947.);
+  scales.push_back(Lumi*169.9/3581947.);
   legends.push_back("t#bar{t} background");
   colors.push_back(kRed+2);
 
@@ -443,17 +443,17 @@ void Plotter::setDataSet(TString mode)
   legends.push_back("Z^{0} / #gamma* #rightarrow ll");
   colors.push_back(kAzure-2);
 
-  dataset.push_back("mumu_dymumu1020.root");
+  dataset.push_back("emu_dymumu1020.root");
   scales.push_back(Lumi*3457./2121872);
   legends.push_back("Z^{0} / #gamma* #rightarrow ll");
   colors.push_back(kAzure-2);
 
-  dataset.push_back("mumu_dymumu2050.root");
+  dataset.push_back("emu_dymumu2050.root");
   scales.push_back(Lumi*1666./2254925);
   legends.push_back("Z^{0} / #gamma* #rightarrow ll");
   colors.push_back(kAzure-2);
 
-  dataset.push_back("mumu_dymumu50inf.root");
+  dataset.push_back("emu_dymumu50inf.root");
   scales.push_back(Lumi*3048./35101516);
   legends.push_back("Z^{0} / #gamma* #rightarrow ll");
   colors.push_back(kAzure-2);
