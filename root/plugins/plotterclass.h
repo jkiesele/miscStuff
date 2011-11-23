@@ -712,7 +712,11 @@ void Plotter::setStyle(TH1F &hist, unsigned int i)
     hist.SetLineWidth(1);
     hist.GetXaxis()->SetLabelFont(42);
     hist.GetXaxis()->SetTitle(name);
+    hist.GetXaxis()->SetTitleSize(0.06);
+    hist.GetXaxis()->SetTitleOffset(0.7);
     hist.GetYaxis()->SetTitle("N");
+    hist.GetYaxis()->SetTitleSize(0.06);
+    hist.GetYaxis()->SetTitleOffset(0.7);
   }
 }
 
