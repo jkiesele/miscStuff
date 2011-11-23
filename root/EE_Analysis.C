@@ -7,29 +7,51 @@
 #include "TLorentzVector.h"
 #include "plugins/rescaleFunctions.h"
 
-#include <fstream>
+
+   //Lepton Scaling factors check AN-11-186 to see pt and eta ranges where are applied
+   float eSF1=1.0094, eSF2=1.0027, eSF3=0.9987, eSF4=0.9990;
+   float eSF5=1.0537, eSF6=1.0324, eSF7=1.0110, eSF8=1.0056;
+   float muSF1=1.0030, muSF2=0.9945, muSF3=0.9988, muSF4=1.0022;
+   float muSF5=0.9984, muSF6=0.9921, muSF7=0.9901, muSF8=0.9896;
+   float muSF9=0.9870, muSF10=0.9811, muSF11=0.9924, muSF12=0.9947;
+
+   //B-tagging Scale factor
+double btagSF=1.;//0.94;
+
+   //Trigger Scale Factor 
+double triggSF=1.;//0.977;  //Just for EE events
+
+//Dilepton mass cut
+
+double llmass=12.;//30.;//40.;//50.;
+
+
+
+
 
 void EE_Analysis::Begin(TTree * /*tree*/)
 {
   totalEventCount=0;
    TString option = GetOption();
 
+
    ///init counters
    TString dataset="ee";
 
-   //rescaleVert_h = readin("EE_Analysis_Rescaler.root", "vertMulti3R");
+//   rescaleVert_h = readin("EE_Analysis_Rescaler.root", "vertMulti3R");
 
 //    TCanvas * c = new TCanvas("","");
 //    c->cd();
 //    rescaleVert_h.Draw();
 //    c->Print("test.ps");
 
-   //dimassRescale_h =  readin("EE_Analysis_Rescaler.root", "dimass3R");
-
-   h_dataZEC = new TH1D("ZpeakEC", "ZPeakEC", 200, 60, 120);
+   h_dataZEC = new TH1D("ZpeakEC", "ZPeakEC", 300, 60, 120);
    h_MCZEC = new TH1D("ZpeakMCEC", "ZPeakMCEC", 300, 60, 120);
-   h_dataZB = new TH1D("ZpeakB", "ZPeakB", 600, 60, 120);
-   h_MCZB = new TH1D("ZpeakMCB", "ZPeakMCB", 900, 60, 120);
+   h_dataZB = new TH1D("ZpeakB", "ZPeakB", 300, 60, 120);
+   h_MCZB = new TH1D("ZpeakMCB", "ZPeakMCB", 300, 60, 120);
+
+
+   float DYScale=1.;
 
    c_step0.setDataSet(dataset);
    c_step0.setOptions("c_step0 after 1 iso", 1);
@@ -47,16 +69,20 @@ void EE_Analysis::Begin(TTree * /*tree*/)
    c_step6.setOptions("c_step6 (twoJets)", 1);
    c_step7.setDataSet(dataset);
    c_step7.setOptions("c_step7 (met)", 1);
+
+   DYScale=1.27;//DYScale Factor
    c_step8.setDataSet(dataset);
-   c_step8.setOptions("c_step8 (1btag)", 1);
+   c_step8.setOptions("c_step8 (1btag)", DYScale);
    c_step9.setDataSet(dataset);
-   c_step9.setOptions("c_step9 (1btag medium WP)", 1);
+   c_step9.setOptions("c_step9 (1btag medium WP)", DYScale);
 
    //init jer jes pu syst counters
 
    //init plotters
 
    //testplotter for some things
+
+   DYScale=1.;
 
    h_testplotter.setDataSet(dataset);
    h_testplotter.setOptions("dimass3 barrel", "m_{ll}", "N", 100, 0, 200, 1);
@@ -90,7 +116,7 @@ void EE_Analysis::Begin(TTree * /*tree*/)
    h_lepMulti1.setDataSet(dataset);
    h_lepMulti1.setOptions("lepMulti1 - 12-50GeV", "N_{l}", "N_{l}", 6, 0, 6, 1);
 
-   float DYScale=1;
+   DYScale=1.;
 h_vertMulti3.   setDataSet(dataset);
 h_vertMulti3.   setOptions("vertMulti3", "N_{vertex}", "N_{evts}", 30, 0, 30, DYScale);
    h_diMass3.   setDataSet(dataset);
@@ -207,7 +233,7 @@ h_vertMulti3a.   setOptions("vertMulti3a", "N_{vertex}", "N_{evts}", 30, 0, 30, 
    h_btagN7.    setDataSet(dataset);
    h_btagN7.    setOptions("btag7", "N_{jets}", "N_{evts}", 7, 0, 7, DYScale);
 
-   // DYScale=1;
+   DYScale=1.27;//DYScale Factor
 
    h_diMass8.   setDataSet(dataset);
    h_diMass8.   setOptions("dileptonMass8", "m_{ll}", "N_{ll}", 30, 0, 300, DYScale);
@@ -229,9 +255,10 @@ h_vertMulti3a.   setOptions("vertMulti3a", "N_{vertex}", "N_{evts}", 30, 0, 30, 
 
    h_diMassZ8.   setDataSet(dataset);
    h_diMassZ8.   setOptions("dileptonMassZ8", "m_{ll}", "N_{ll}", 30, 0, 300, DYScale);
+   DYScale=1;
    h_diMassZ7.   setDataSet(dataset);
    h_diMassZ7.   setOptions("dileptonMassZ7", "m_{ll}", "N_{ll}", 50, 0, 300, DYScale);
-   DYScale=1;
+
    h_diMassZ6.   setDataSet(dataset);
    h_diMassZ6.   setOptions("dileptonMassZ6", "m_{ll}", "N_{ll}", 50, 0, 300, DYScale);
    h_diMassZ5.   setDataSet(dataset);
@@ -241,6 +268,7 @@ h_vertMulti3a.   setOptions("vertMulti3a", "N_{vertex}", "N_{evts}", 30, 0, 30, 
 
 
    testcounter=0;
+
 
 
 }
@@ -263,7 +291,11 @@ Bool_t EE_Analysis::Process(Long64_t entry)
 
   totalEventCount++;
   double totalevents=8.125e+06;
-  if((int)(100*totalEventCount)%(int)(totalevents) ==0) std::cout << totalEventCount << "\t\tEvents processed \tca. " << (int) totalEventCount/totalevents* 100 << "%" << std::endl;
+  if((int)(100*totalEventCount)%(int)(totalevents) ==0)
+  {
+     std::cout << totalEventCount << "\t\tEvents processed \tca. " << (int) totalEventCount/totalevents* 100 << "%" << std::endl;
+  };
+
 
   TString DataType;  
   DataType="def";
@@ -271,7 +303,7 @@ Bool_t EE_Analysis::Process(Long64_t entry)
 
   bool isData=c_step0.isData(DataType);
 
-  bool reweight=false;
+ 
 
   bool b_step1=false; 
   bool b_step2=false; 
@@ -286,8 +318,8 @@ Bool_t EE_Analysis::Process(Long64_t entry)
   //loop over leptons
 
 
-  float isocutmuons = 999999;//0.3;//0.2; //0.2;  //0.2;//0.2; pf // 0.15 comb
-  float isocutelecs = 999999; //0.3;//0.17;//0.17; //0.17; //0.17;//0.17;
+  float isocutmuons = 0.20;//999999; //0.3;//0.2; //0.2;  //0.2;//0.2; pf // 0.15 comb
+  float isocutelecs = 0.17;//999999; //0.3;//0.17;//0.17; //0.17; //0.17;//0.17;
   bool pfIso = true;
   float leptontype = -1; // 1 muon -1 electron
   bool oppocharge=true;
@@ -296,7 +328,7 @@ Bool_t EE_Analysis::Process(Long64_t entry)
 
   float tempiso=100;
 
-  std::vector<float> VLepPt;
+  std::vector<double> VLepPt;
   std::vector<double> VLepEta, VLepPhi, VLepE, VLepPx, VLepPy, VLepPz, VLepPfIso, VLepCombIso;
   std::vector<int> VLepQ, VLepType;
  
@@ -342,7 +374,7 @@ Bool_t EE_Analysis::Process(Long64_t entry)
       VLepType.push_back(*(lepType->begin()+i));
       VLepPhi.push_back(*(lepPhi->begin()+i));
     }
-    if(VLepType.size()==1 && oppocharge) CheckCharge=VLepQ[0];
+    if(VLepType.size()==1 && oppocharge) CheckCharge=VLepQ[0];//only leptons with opposite charge respect to the pT-Leading leptons are stored
     else if(VLepType.size()==1 && !oppocharge) CheckCharge= - VLepQ[0];
   }
 
@@ -353,7 +385,7 @@ Bool_t EE_Analysis::Process(Long64_t entry)
 
 
 
-  //PUweight=1;
+  //  PUweight=1;
 
 
 
@@ -387,7 +419,7 @@ Bool_t EE_Analysis::Process(Long64_t entry)
     if(*ajetTCHE > btagWP) btagmulti++;
   }
 
-  if(btagmulti > 0) b_step8=true;
+  if(btagmulti > 0 && dimass > llmass) b_step8=true;
   if(btagmultiM > 0) b_step9=true;
 
   //histos for lep energy scale
@@ -407,6 +439,35 @@ Bool_t EE_Analysis::Process(Long64_t entry)
   }
 
 
+
+  //Lepton scaling factor selection
+  double lepSF[2]={0.,0.};
+
+  for (int i=0; i<2; i++)
+    {
+      if(20.0<= VLepPt[i] && VLepPt[i] <30.)
+	{
+	  if (VLepEta[i]<=1.5)     {lepSF[i]=eSF1;}
+	  else if (VLepEta[i]>1.5) {lepSF[i]=eSF5;};
+	}
+      else if(30.0<= VLepPt[i] && VLepPt[i] <40.)
+	{
+	  if (VLepEta[i]<=1.5)     {lepSF[i]=eSF2;}
+	  else if (VLepEta[i]>1.5) {lepSF[i]=eSF6;};
+	}
+      else if(40.0<= VLepPt[i] && VLepPt[i] <50.)
+	{
+	  if (VLepEta[i]<=1.5)     {lepSF[i]=eSF3;}
+	  else if (VLepEta[i]>1.5) {lepSF[i]=eSF7;};
+	}
+      else if(50.0<= VLepPt[i])
+	{
+	  if (VLepEta[i]<=1.5)     {lepSF[i]=eSF4;}
+	  else if (VLepEta[i]>1.5) {lepSF[i]=eSF8;};
+	}
+    };
+ 
+
   //Fill the histograms etc apart from step 0 (this is filled at the top
 
 
@@ -423,26 +484,13 @@ Bool_t EE_Analysis::Process(Long64_t entry)
   
 
   //  if(!isData) std::cout << PUweight << std::endl;
-  //if(!isData) PUweight = PUweight * reweightWeight(dimassRescale_h, dimass);
+//  if(!isData) PUweight = PUweight * reweightWeight(rescaleVert_h, vertMulti);
   //  if(!isData) std::cout << PUweight << '\n' << std::endl;
 
+ //MC reweighting: Lept SF, Trigger SF, BTag SF
+  if (!isData) PUweight=PUweight*lepSF[0]*lepSF[1]*triggSF*btagSF;
 
 
-
-//   if(reweight && !isData && b_step3 && dimass<50){
-//     std::vector<TString> samples;
-//     samples.push_back("ee_dyee1020.root");
-//     samples.push_back("ee_dyee2050.root");
-//     samples.push_back("ee_dyee50inf.root");
-
-//     for (unsigned int i = 0; i< samples.size(); i++){
-//       if(DataType == samples[i]){
-// 	PUweight = PUweight * reweightWeight(dimassRescale_h, dimass);
-// 	break;
-//       }
-
-//     }
-//   }
 
   if(b_step1 && b_step2 && b_step3){
     c_step3.fill(DataType, PUweight);
@@ -578,7 +626,8 @@ void EE_Analysis::Terminate()
 
 
  
-  TFile *f = new TFile("EE_DEFAULTOUT.root","RECREATE");
+  TFile *f = new TFile("/scratch/hh/current/cms/user/asincruz/NTuples/EE_AnalysisM12.root","RECREATE");
+  //  TString *step;
 
   h_dataZEC->Write();
   h_dataZB->Write();
@@ -589,7 +638,10 @@ h_testplotter.write();
 h_testplotter2.write();
 
 
-  h_lepQ0.write();
+ TDirectory *d1=(TDirectory*)f->mkdir("Step0");
+ d1->cd();
+  
+ h_lepQ0.write();
   h_combIso0.write();
   h_combIso1.write();
   h_PfIso1.write();
@@ -601,8 +653,10 @@ h_testplotter2.write();
   h_lepMulti0. write();
 
   h_lepMulti1. write();
+  d1->Close();
 
-
+  TDirectory *d3=(TDirectory*)f->mkdir("Step3");
+  d3->cd();
     h_vertMulti3.   write();
   h_diMass3.   write();
   h_lepPt3.    write();
@@ -611,8 +665,12 @@ h_testplotter2.write();
   h_jetMulti3. write();
   h_metEt3.    write();
   h_btagN3.    write();
+  d3->Close();
+  d3->Clear();
 
 
+  TDirectory *d3a=(TDirectory*)f->mkdir("Step3a");
+  d3a->cd();
     h_vertMulti3a.   write();
   h_diMass3a.   write();
   h_lepPt3a.    write();
@@ -621,8 +679,11 @@ h_testplotter2.write();
   h_jetMulti3a. write();
   h_metEt3a.    write();
   h_btagN3a.    write();
+  d3a->Close();
+  d3a->Clear();
 
-
+  TDirectory *d4=(TDirectory*)f->mkdir("Step4");
+  d4->cd();
   h_diMass4.   write();
   h_lepPt4.    write();
   h_lepEta4.   write();
@@ -630,7 +691,12 @@ h_testplotter2.write();
   h_jetMulti4. write();
   h_metEt4.    write();
   h_btagN4.    write();
+  d4->Close();
+  d4->Clear();
 
+
+  TDirectory *d5=(TDirectory*)f->mkdir("Step5");
+  d5->cd();
   h_diMass5.   write();
   h_lepPt5.    write();
   h_lepEta5.   write();
@@ -638,7 +704,11 @@ h_testplotter2.write();
   h_jetMulti5. write();
   h_metEt5.    write();
   h_btagN5.    write();
+  d5->Close();
+  d5->Clear();
 
+  TDirectory *d6=(TDirectory*)f->mkdir("Step6");
+  d6->cd();
   h_diMass6.   write();
   h_lepPt6.    write();
   h_lepEta6.   write();
@@ -646,7 +716,12 @@ h_testplotter2.write();
   h_jetMulti6. write();
   h_metEt6.    write();
   h_btagN6.    write();
+  d6->Close();
+  d6->Clear();
 
+
+  TDirectory *d7=(TDirectory*)f->mkdir("Step7");
+  d7->cd();
   h_diMass7.   write();
   h_lepPt7.    write();
   h_lepEta7.   write();
@@ -654,7 +729,12 @@ h_testplotter2.write();
   h_jetMulti7. write();
   h_metEt7.    write();
   h_btagN7.    write();
+  d7->Close();
+  d7->Clear();
 
+
+  TDirectory *d8=(TDirectory*)f->mkdir("Step8");
+  d8->cd();
   h_diMass8.   write();
   h_lepPt8.    write();
   h_lepEta8.   write();
@@ -662,30 +742,20 @@ h_testplotter2.write();
   h_jetMulti8. write();
   h_metEt8.    write();
   h_btagN8.    write();
+  d8->Close();
+  d8->Clear();
 
+
+  TDirectory *dpk=(TDirectory*)f->mkdir("DYPeak");
+  dpk->cd();
   h_diMassZ4.  write();
   h_diMassZ5.  write();
   h_diMassZ6.  write();
   h_diMassZ7.  write();
   h_diMassZ8.  write();
+  dpk->Close();
+  dpk->Clear();
 
-
- std::vector<TString> DYsamples;
- //DYsamples.push_back("ee_dyee1020.root");
-  //DYsamples.push_back("ee_dyee2050.root");
-  DYsamples.push_back("ee_dyee50inf.root");
-
-
- std::vector<TString> Zsamples;
-  Zsamples.push_back("ee_Zee.root");
-
-
- std::vector<TString> ttsamples;
-  ttsamples.push_back("ee_ttbarsignal.root");
-  ttsamples.push_back("ee_ttbarviatau.root");
-
- std::vector<TString> ttviatausamples;
-  ttviatausamples.push_back("ee_ttbarviatau.root");
 
 
   c_step0.coutNs();
@@ -704,42 +774,18 @@ h_testplotter2.write();
   c_step9.coutNs();
   c_step9.coutNsig("t#bar{t} signal");
 
-  double Lumi=1141;
 
+  std::cout <<"Number of total events processed = "<<  testcounter << std::endl;
 
- ///!!!!!!!NOT finished!!!just a test
-  double Zeff=  c_step3.getEff(DYsamples, 11270427);
-  double tteff = c_step8.getEff(ttsamples, 44616+17580);
-  std::cout << "tt Eff"  << tteff <<std::endl;
-  std::cout << "Z Eff"  << Zeff <<std::endl;           
-  std::cout << "fract ZEff/tteff"  << Zeff/tteff <<std::endl;   
-
-  // std::cout << testcounter << std::endl;
 
   f->Close();
 
-  double ttxsec=0;
-  double Zxsec=0;
 
-  ofstream myfile;
-  myfile.open ("EE_out.txt", ios::out | ios::app);
-  myfile << "DEFAULT ttxsec: ";
-  myfile << ttxsec;
-  myfile << "\nDEFAULT Zxsec: ";
-  myfile << Zxsec;
+//   TFile *f2 = new TFile("EE_Analysis_Rescaler.root","RECREATE");
 
-  myfile.close();
-  //////////
-  //replace DEFAULT per script with corrosponding sample and use DEFAULT_load_EE.C in root
-  // with root -q -l DEFAULT_load_EE.C ..
+//   h_vertMulti3.writeRescaleHisto("vertMulti3R");
+//   h_vertMulti3a.writeRescaleHisto("vertMulti3aR");
 
-//   TFile *f2 = new TFile("EE_Analysis_Rescaler.root","UPDATE");
-
-// //   h_vertMulti3.writeRescaleHisto("vertMulti3R");
-// //   h_vertMulti3a.writeRescaleHisto("vertMulti3aR");
-
-//   h_diMass3.writeRescaleHisto("dimass3R", samples);
-
-//    f2->Close();
+//   f2->Close();
 
 }

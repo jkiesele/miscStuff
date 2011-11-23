@@ -8,6 +8,27 @@
 #include "plugins/rescaleFunctions.h"
 
 
+
+   //Lepton Scaling factors check AN-11-186 to see pt and eta ranges where are applied
+   float eSF1=1.0094, eSF2=1.0027, eSF3=0.9987, eSF4=0.9990;
+   float eSF5=1.0537, eSF6=1.0324, eSF7=1.0110, eSF8=1.0056;
+   float muSF1=1.0030, muSF2=0.9945, muSF3=0.9988, muSF4=1.0022;
+   float muSF5=0.9984, muSF6=0.9921, muSF7=0.9901, muSF8=0.9896;
+   float muSF9=0.9870, muSF10=0.9811, muSF11=0.9924, muSF12=0.9947;
+
+
+   //B-tagging Scale factor
+double btagSF=1.;//0.94;
+
+   //Trigger Scale Factor 
+double triggSF=1.;//0.961;  //MuMu events
+
+
+//Change the output file name, according to the mll used!!!
+double llmass=12.;// 50.; // 30.; // 20.;// different dilepton mass cuts
+//======================================
+
+
 void MuMu_Analysis::Begin(TTree * /*tree*/)
 {
 
@@ -17,18 +38,10 @@ void MuMu_Analysis::Begin(TTree * /*tree*/)
    ///init counters
    TString dataset="mumu";
 
-//    rescaleVert0_h = readin("MuMu_Analysis_Rescaler.root", "vertMulti0R");
-//    rescaleVert3_h = readin("MuMu_Analysis_Rescaler.root", "vertMulti3DYR");
-//    rescaleVert4_h = readin("MuMu_Analysis_Rescaler.root", "vertMulti4DYR");
-//    rescaleVert5_h = readin("MuMu_Analysis_Rescaler.root", "vertMulti5DYR");
-//    rescaleVert6_h = readin("MuMu_Analysis_Rescaler.root", "vertMulti6DYR");
-//    rescaleVert7_h = readin("MuMu_Analysis_Rescaler.root", "vertMulti7DYR");
-//    rescaleVert8_h = readin("MuMu_Analysis_Rescaler.root", "vertMulti8DYR");
+   //   rescaleVert_h = readinErrorsDown("EE_Analysis_Rescaler.root", "vertMulti3R");
 
-//    rescaleDimass_h = readin("MuMu_Analysis_Rescaler.root", "dimass3R");
+   float DYScale=1.;
 
-   dimass_hD = new TH1D("dimassData","",400,60,120);
-   dimass_hMC= new TH1D("dimassMC","",900,60,120);
 
    c_step0.setOptions("c_step0 after 1 iso", 1);
    c_step0.setDataSet(dataset);
@@ -46,10 +59,12 @@ void MuMu_Analysis::Begin(TTree * /*tree*/)
    c_step6.setOptions("c_step6 (twoJets)", 1);
    c_step7.setDataSet(dataset);
    c_step7.setOptions("c_step7 (met)", 1);
+
+   DYScale=1.23;//DYScale Factor
    c_step8.setDataSet(dataset);
-   c_step8.setOptions("c_step8 (1btag)", 1);
+   c_step8.setOptions("c_step8 (1btag)", DYScale);
    c_step9.setDataSet(dataset);
-   c_step9.setOptions("c_step9 (1btag medium WP)", 1);
+   c_step9.setOptions("c_step9 (1btag medium WP)", DYScale);
 
    //init jer jes pu syst counters
 
@@ -64,8 +79,6 @@ void MuMu_Analysis::Begin(TTree * /*tree*/)
 
    //standard plotters
 
-h_vertMulti0.   setDataSet(dataset);
-h_vertMulti0.   setOptions("vertMulti0", "N_{vertex}", "N_{evts}", 30, 0, 30, 1);
    h_combIso0.setDataSet(dataset);
    h_combIso0.setOptions("combIso0", "Iso_{comb}", "N", 100, 0, 1, 1);
    h_PfIso0.setDataSet(dataset);
@@ -91,7 +104,7 @@ h_vertMulti0.   setOptions("vertMulti0", "N_{vertex}", "N_{evts}", 30, 0, 30, 1)
    h_lepMulti1.setDataSet(dataset);
    h_lepMulti1.setOptions("lepMulti1 - 12-50GeV", "N_{l}", "N_{l}", 6, 0, 6, 1);
 
-   float DYScale=1;
+   DYScale=1;
 h_vertMulti3.   setDataSet(dataset);
 h_vertMulti3.   setOptions("vertMulti3", "N_{vertex}", "N_{evts}", 30, 0, 30, DYScale);
    h_diMass3.   setDataSet(dataset);
@@ -134,8 +147,6 @@ h_vertMulti3a.   setOptions("vertMulti3a", "N_{vertex}", "N_{evts}", 30, 0, 30, 
 
    DYScale=1;
 
-h_vertMulti4.   setDataSet(dataset);
-h_vertMulti4.   setOptions("vertMulti4", "N_{vertex}", "N_{evts}", 30, 0, 30, DYScale);
    h_diMass4.   setDataSet(dataset);
    h_diMass4.   setOptions("dileptonMass4", "m_{ll}", "N_{ll}", 100, 0, 300, DYScale);
    h_lepPt4.    setDataSet(dataset);
@@ -155,8 +166,6 @@ h_vertMulti4.   setOptions("vertMulti4", "N_{vertex}", "N_{evts}", 30, 0, 30, DY
 
    DYScale=1;
 
-h_vertMulti5.   setDataSet(dataset);
-h_vertMulti5.   setOptions("vertMulti5", "N_{vertex}", "N_{evts}", 30, 0, 30, DYScale);
    h_diMass5.   setDataSet(dataset);
    h_diMass5.   setOptions("dileptonMass5", "m_{ll}", "N_{ll}", 100, 0, 300, DYScale);
    h_lepPt5.    setDataSet(dataset);
@@ -176,8 +185,6 @@ h_vertMulti5.   setOptions("vertMulti5", "N_{vertex}", "N_{evts}", 30, 0, 30, DY
 
    DYScale=1;
 
-h_vertMulti6.   setDataSet(dataset);
-h_vertMulti6.   setOptions("vertMulti6", "N_{vertex}", "N_{evts}", 30, 0, 30, DYScale);
    h_diMass6.   setDataSet(dataset);
    h_diMass6.   setOptions("dileptonMass6", "m_{ll}", "N_{ll}", 40, 0, 300, DYScale);
    h_lepPt6.    setDataSet(dataset);
@@ -197,8 +204,6 @@ h_vertMulti6.   setOptions("vertMulti6", "N_{vertex}", "N_{evts}", 30, 0, 30, DY
 
    DYScale=1.;
 
-h_vertMulti7.   setDataSet(dataset);
-h_vertMulti7.   setOptions("vertMulti7", "N_{vertex}", "N_{evts}", 30, 0, 30, DYScale);
    h_diMass7.   setDataSet(dataset);
    h_diMass7.   setOptions("dileptonMass7", "m_{ll}", "N_{ll}", 30, 0, 300, DYScale);
    h_lepPt7.    setDataSet(dataset);
@@ -216,10 +221,8 @@ h_vertMulti7.   setOptions("vertMulti7", "N_{vertex}", "N_{evts}", 30, 0, 30, DY
    h_btagN7.    setDataSet(dataset);
    h_btagN7.    setOptions("btag7", "N_{jets}", "N_{evts}", 7, 0, 7, DYScale);
 
-   // DYScale=1;
+   DYScale=1.23;//DYScale factor
 
-h_vertMulti8.   setDataSet(dataset);
-h_vertMulti8.   setOptions("vertMulti8", "N_{vertex}", "N_{evts}", 30, 0, 30, DYScale);
    h_diMass8.   setDataSet(dataset);
    h_diMass8.   setOptions("dileptonMass8", "m_{ll}", "N_{ll}", 30, 0, 300, DYScale);
    h_lepPt8.    setDataSet(dataset);
@@ -295,21 +298,18 @@ Bool_t MuMu_Analysis::Process(Long64_t entry)
 
   //loop over leptons
 
-  bool rescale=true;
 
-  float isocutmuons = 999999;//0.3;//0.2; //0.2;  //0.2;//0.2; pf // 0.15 comb
-  float isocutelecs = 999999; //0.3;//0.17;//0.17; //0.17; //0.17;//0.17;
+  float isocutmuons = 0.2;//999999;//0.3;//0.2; //0.2;  //0.2;//0.2; pf // 0.15 comb
+  float isocutelecs = 0.17;//999999; //0.3;//0.17;//0.17; //0.17; //0.17;//0.17;
   bool pfIso = true;
   float leptontype = 1; // 1 muon -1 electron
   bool oppocharge=true;
   float globalElecEnergyScale=1.0;
   //if(DataType == "ee_200rereco.root" || DataType == "ee_800prompt.root" ) globalElecEnergyScale=1.005; //just play around
 
-
-
   float tempiso=100;
 
-  std::vector<float> VLepPt;
+  std::vector<double> VLepPt;
   std::vector<double> VLepEta, VLepPhi, VLepE, VLepPx, VLepPy, VLepPz, VLepPfIso, VLepCombIso;
   std::vector<int> VLepQ, VLepType;
  
@@ -320,7 +320,6 @@ Bool_t MuMu_Analysis::Process(Long64_t entry)
   h_lepEta0.   fill(DataType,*lepEta , PUweight);
   h_lepType0.  fill(DataType,*lepType , PUweight);
   h_lepQ0.  fill(DataType,*lepQ , PUweight);
-  h_vertMulti0.   fill(DataType,vertMulti ,  PUweight);
 
   //h_lepMulti0.fill(DataType, (int)lepPt->size(), PUweight);
   
@@ -401,18 +400,46 @@ Bool_t MuMu_Analysis::Process(Long64_t entry)
     if(*ajetTCHE > btagWP) btagmulti++;
   }
 
-  if(btagmulti > 0) b_step8=true;
+  if(btagmulti > 0 && dimass >llmass) b_step8=true;
   if(btagmultiM > 0) b_step9=true;
 
 
 
 
   //Fill the histograms etc apart from step 0 (this is filled at the top
-  if(b_step1 && b_step2 && b_step3){
-    if(c_step1.isData(DataType))                 dimass_hD->Fill(dimass);
-    else if(DataType == "mumu_dymumu50inf.root") dimass_hMC->Fill(dimass);
-  
-  }
+
+
+
+  //Lepton scaling factor selection
+  double lepSF[2]={0.,0.};
+
+  for (int i=0; i<2; i++)
+    {
+      if(20.0<= VLepPt[i] && VLepPt[i] <30.)
+	{
+	  if (VLepEta[i]<=1.5)     {lepSF[i]=eSF1;}
+	  else if (VLepEta[i]>1.5) {lepSF[i]=eSF5;};
+	}
+      else if(30.0<= VLepPt[i] && VLepPt[i] <40.)
+	{
+	  if (VLepEta[i]<=1.5)     {lepSF[i]=eSF2;}
+	  else if (VLepEta[i]>1.5) {lepSF[i]=eSF6;};
+	}
+      else if(40.0<= VLepPt[i] && VLepPt[i] <50.)
+	{
+	  if (VLepEta[i]<=1.5)     {lepSF[i]=eSF3;}
+	  else if (VLepEta[i]>1.5) {lepSF[i]=eSF7;};
+	}
+      else if(50.0<= VLepPt[i])
+	{
+	  if (VLepEta[i]<=1.5)     {lepSF[i]=eSF4;}
+	  else if (VLepEta[i]>1.5) {lepSF[i]=eSF8;};
+	}
+    };
+ 
+
+
+
 
   if (b_step1){
 
@@ -424,17 +451,14 @@ Bool_t MuMu_Analysis::Process(Long64_t entry)
   if (b_step1 && b_step2) c_step2.fill(DataType, PUweight);
   
 
-  
-//   std::vector<TString> samples;
-//   samples.push_back("mumu_dymumu1020.root");
-//   samples.push_back("mumu_dymumu2050.root");
-//   samples.push_back("mumu_dymumu50inf.root");
+  //  if(!isData) std::cout << PUweight << std::endl;
+  //  if(!isData) PUweight = PUweight * reweightWeight(rescaleVert_h, vertMulti);
+  //  if(!isData) std::cout << PUweight << '\n' << std::endl;
 
-//   if(b_step3 && dimass < 50){
-//     for(unsigned int i=0; i< samples.size() ;i++){
-//       if(rescale && samples[i] == DataType) PUweight = PUweight * reweightWeight(rescaleDimass_h, dimass);
-//     }
-//   }
+
+  //MC reweighting: Lept SF, Trigger SF, BTag SF
+  if (!isData) PUweight=PUweight*lepSF[0]*lepSF[1]*triggSF*btagSF;
+
 
 
   if(b_step1 && b_step2 && b_step3){
@@ -458,6 +482,7 @@ Bool_t MuMu_Analysis::Process(Long64_t entry)
   }
 
 
+
   if(b_step1 && b_step2 && b_step3 && dimass < 50){
 
 
@@ -478,7 +503,6 @@ Bool_t MuMu_Analysis::Process(Long64_t entry)
     if(b_step4){
       c_step4.fill(DataType, PUweight);
 
-      h_vertMulti4.   fill(DataType,vertMulti ,  PUweight);
       h_diMass4.  fill(DataType, dimass,  PUweight);
       h_lepPt4.   fill(DataType, VLepPt,    PUweight);
       h_lepEta4.  fill(DataType, VLepEta ,  PUweight);
@@ -494,7 +518,6 @@ Bool_t MuMu_Analysis::Process(Long64_t entry)
     if(b_step4){
       c_step5.fill(DataType, PUweight);
 
-      h_vertMulti5.   fill(DataType,vertMulti ,  PUweight);
       h_diMass5.  fill(DataType, dimass,  PUweight);
       h_lepPt5.   fill(DataType, VLepPt,    PUweight);
       h_lepEta5.  fill(DataType, VLepEta ,  PUweight);
@@ -504,19 +527,12 @@ Bool_t MuMu_Analysis::Process(Long64_t entry)
       h_btagN5.   fill(DataType, btagmulti ,PUweight);
     }
   }
-
-
-
   
-
-
-
   if(b_step1 && b_step2 && b_step3 &&  b_step5 && b_step6){
     h_diMassZ6.  fill(DataType, dimass,  PUweight);
     if(b_step4){
       c_step6.fill(DataType, PUweight);
 
-      h_vertMulti6.   fill(DataType,vertMulti ,  PUweight);
       h_diMass6.  fill(DataType, dimass,  PUweight);
       h_lepPt6.   fill(DataType, VLepPt,    PUweight);
       h_lepEta6.  fill(DataType, VLepEta ,  PUweight);
@@ -532,7 +548,6 @@ Bool_t MuMu_Analysis::Process(Long64_t entry)
     if(b_step4){
       c_step7.fill(DataType, PUweight);
 
-      h_vertMulti7.   fill(DataType,vertMulti ,  PUweight);
       h_diMass7.  fill(DataType, dimass,  PUweight);
       h_lepPt7.   fill(DataType, VLepPt,    PUweight);
       h_lepEta7.  fill(DataType, VLepEta ,  PUweight);
@@ -546,16 +561,15 @@ Bool_t MuMu_Analysis::Process(Long64_t entry)
   if(b_step1 && b_step2 && b_step3 && b_step5 && b_step6 && b_step7 && b_step8){
     h_diMassZ8.  fill(DataType, dimass,  PUweight);
     if(b_step4){
-      c_step8.fill(DataType, PUweight);
+    c_step8.fill(DataType, PUweight);
 
-      h_vertMulti8.   fill(DataType,vertMulti ,  PUweight);
-      h_diMass8.  fill(DataType, dimass,  PUweight);
-      h_lepPt8.   fill(DataType, VLepPt,    PUweight);
-      h_lepEta8.  fill(DataType, VLepEta ,  PUweight);
-      h_jetPt8.   fill(DataType, *jetPt ,   PUweight);
-      h_jetMulti8.fill(DataType, jetMulti , PUweight);
-      h_metEt8.   fill(DataType, *metEt ,   PUweight);
-      h_btagN8.   fill(DataType, btagmulti ,PUweight);
+    h_diMass8.  fill(DataType, dimass,  PUweight);
+    h_lepPt8.   fill(DataType, VLepPt,    PUweight);
+    h_lepEta8.  fill(DataType, VLepEta ,  PUweight);
+    h_jetPt8.   fill(DataType, *jetPt ,   PUweight);
+    h_jetMulti8.fill(DataType, jetMulti , PUweight);
+    h_metEt8.   fill(DataType, *metEt ,   PUweight);
+    h_btagN8.   fill(DataType, btagmulti ,PUweight);
     }
   }
 
@@ -568,7 +582,7 @@ Bool_t MuMu_Analysis::Process(Long64_t entry)
 
 
 
-return kTRUE;
+   return kTRUE;
 }
 
 void MuMu_Analysis::SlaveTerminate()
@@ -587,16 +601,14 @@ void MuMu_Analysis::Terminate()
 
 
  
-  TFile *f = new TFile("MuMu_Analysis.root","RECREATE");
+  TFile *f = new TFile("/scratch/hh/current/cms/user/asincruz/NTuples/MuMu_AnalysisM12.root","RECREATE");
 
 
-  h_testplotter.write();
-  h_testplotter2.write();
+h_testplotter.write();
+h_testplotter2.write();
 
-  dimass_hD->Write();
-  dimass_hMC->Write();
-
-    h_vertMulti0.   write();
+  TDirectory *d0=(TDirectory*)f->mkdir("Step0");
+  d0->cd();
   h_lepQ0.write();
   h_combIso0.write();
   h_combIso1.write();
@@ -610,7 +622,12 @@ void MuMu_Analysis::Terminate()
 
   h_lepMulti1. write();
 
+  d0->Close();
+  d0->Clear();
 
+
+  TDirectory *d3=(TDirectory*)f->mkdir("Step3");
+  d3->cd();
     h_vertMulti3.   write();
   h_diMass3.   write();
   h_lepPt3.    write();
@@ -619,8 +636,11 @@ void MuMu_Analysis::Terminate()
   h_jetMulti3. write();
   h_metEt3.    write();
   h_btagN3.    write();
+  d3->Close();
+  d3->Clear();
 
-
+  TDirectory *d3a=(TDirectory*)f->mkdir("Step3a");
+  d3a->cd();
     h_vertMulti3a.   write();
   h_diMass3a.   write();
   h_lepPt3a.    write();
@@ -629,9 +649,11 @@ void MuMu_Analysis::Terminate()
   h_jetMulti3a. write();
   h_metEt3a.    write();
   h_btagN3a.    write();
+  d3a->Close();
+  d3a->Clear();
 
-
-    h_vertMulti4.   write();
+  TDirectory *d4=(TDirectory*)f->mkdir("Step4");
+  d4->cd();
   h_diMass4.   write();
   h_lepPt4.    write();
   h_lepEta4.   write();
@@ -639,8 +661,11 @@ void MuMu_Analysis::Terminate()
   h_jetMulti4. write();
   h_metEt4.    write();
   h_btagN4.    write();
+  d4->Close();
+  d4->Clear();
 
-    h_vertMulti5.   write();
+  TDirectory *d5=(TDirectory*)f->mkdir("Step5");
+  d5->cd();
   h_diMass5.   write();
   h_lepPt5.    write();
   h_lepEta5.   write();
@@ -648,8 +673,11 @@ void MuMu_Analysis::Terminate()
   h_jetMulti5. write();
   h_metEt5.    write();
   h_btagN5.    write();
+  d5->Close();
+  d5->Clear();
 
-    h_vertMulti6.   write();
+  TDirectory *d6=(TDirectory*)f->mkdir("Step6");
+  d6->cd();
   h_diMass6.   write();
   h_lepPt6.    write();
   h_lepEta6.   write();
@@ -657,8 +685,11 @@ void MuMu_Analysis::Terminate()
   h_jetMulti6. write();
   h_metEt6.    write();
   h_btagN6.    write();
+  d6->Close();
+  d6->Clear();
 
-    h_vertMulti7.   write();
+  TDirectory *d7=(TDirectory*)f->mkdir("Step7");
+  d7->cd();
   h_diMass7.   write();
   h_lepPt7.    write();
   h_lepEta7.   write();
@@ -666,8 +697,11 @@ void MuMu_Analysis::Terminate()
   h_jetMulti7. write();
   h_metEt7.    write();
   h_btagN7.    write();
+  d7->Close();
+  d7->Clear();
 
-    h_vertMulti8.   write();
+  TDirectory *d8=(TDirectory*)f->mkdir("Step8");
+  d8->cd();
   h_diMass8.   write();
   h_lepPt8.    write();
   h_lepEta8.   write();
@@ -675,13 +709,18 @@ void MuMu_Analysis::Terminate()
   h_jetMulti8. write();
   h_metEt8.    write();
   h_btagN8.    write();
+  d8->Close();
+  d8->Clear();
 
+  TDirectory *dpk=(TDirectory*)f->mkdir("DYPeak");
+  dpk->cd();
   h_diMassZ4.  write();
   h_diMassZ5.  write();
   h_diMassZ6.  write();
   h_diMassZ7.  write();
   h_diMassZ8.  write();
-
+  dpk->Close();
+  dpk->Clear();
 
   c_step0.coutNs();
 
@@ -704,38 +743,14 @@ void MuMu_Analysis::Terminate()
 
   f->Close();
 
-  std::vector<TString> samples;
-  samples.push_back("mumu_dymumu1020.root");
-  samples.push_back("mumu_dymumu2050.root");
-  samples.push_back("mumu_dymumu50inf.root");
+  /*
+  TFile *f2 = new TFile("/scratch/hh/current/cms/user/asincruz/MuMu_Analysis_Rescaler.root","RECREATE");
 
-//   TFile *f2 = new TFile("MuMu_Analysis_Rescaler.root","UPDATE");
+  h_vertMulti3.writeRescaleHisto("vertMulti3R");
+  h_vertMulti3a.writeRescaleHisto("vertMulti3aR");
 
-//   h_vertMulti0.writeRescaleHisto("vertMulti0R");
-//   h_vertMulti3.writeRescaleHisto("vertMulti3R");
-//   h_vertMulti3a.writeRescaleHisto("vertMulti3aR");
-//   h_vertMulti4.writeRescaleHisto("vertMulti4R");
-//   h_vertMulti5.writeRescaleHisto("vertMulti5R");
-//   h_vertMulti6.writeRescaleHisto("vertMulti6R");
-//   h_vertMulti7.writeRescaleHisto("vertMulti7R");
-//   h_vertMulti8.writeRescaleHisto("vertMulti8R");
+  f2->Close();
 
-//   h_vertMulti0.writeRescaleHisto("vertMulti0DYR", samples);
-//   h_vertMulti3.writeRescaleHisto("vertMulti3DYR", samples);
-//   h_vertMulti3a.writeRescaleHisto("vertMulti3aDYR", samples);
-//   h_vertMulti4.writeRescaleHisto("vertMulti4DYR", samples);
-//   h_vertMulti5.writeRescaleHisto("vertMulti5DYR", samples);
-//   h_vertMulti6.writeRescaleHisto("vertMulti6DYR", samples);
-//   h_vertMulti7.writeRescaleHisto("vertMulti7DYR", samples);
-
-//   h_vertMulti8.writeRescaleHisto("vertMulti8DYR", samples);
-
-// h_diMass3.writeRescaleHisto("dimass3R", samples);
-// h_diMass4.writeRescaleHisto("dimass4R", samples);
-// h_diMass5.writeRescaleHisto("dimass5R", samples);
-
-//   f2->Close();
-
-
+  */
 
 }

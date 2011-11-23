@@ -9,10 +9,33 @@
 #include "plugins/rescaleFunctions.h"
 
 
+
+
+  //Lepton Scaling factors check AN-11-186 to see pt and eta ranges where are applied
+   float eSF1=1.0094, eSF2=1.0027, eSF3=0.9987, eSF4=0.9990;
+   float eSF5=1.0537, eSF6=1.0324, eSF7=1.0110, eSF8=1.0056;
+   float muSF1=1.0030, muSF2=0.9945, muSF3=0.9988, muSF4=1.0022;
+   float muSF5=0.9984, muSF6=0.9921, muSF7=0.9901, muSF8=0.9896;
+   float muSF9=0.9870, muSF10=0.9811, muSF11=0.9924, muSF12=0.9947;
+
+   //B-tagging Scale factor
+double btagSF=1.;//0.94;
+
+   //Trigger Scale Factor 
+double triggSF=1.;//0.987;  //Just for EMu events
+
+
+//Dilepton mass cut
+
+double llmass=12.;//20.;// 30.;//40.;//50.;//
+
+
+
 void EMuAnalysis::Begin(TTree * /*tree*/)
 {
    TString option = GetOption();
   totalEventCount=0;
+
 
    ///init counters
    TString dataset="emu";
@@ -284,12 +307,12 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
 
   //loop over leptons
 
-  bool rescale=true;
+  //  bool rescale=true;
 
-  float isocutmuons = 999999;//0.3;//0.2; //0.2;  //0.2;//0.2; pf // 0.15 comb
-  float isocutelecs = 999999; //0.3;//0.17;//0.17; //0.17; //0.17;//0.17;
+  float isocutmuons = 0.2;//999999;//0.3;//0.2; //0.2;  //0.2;//0.2; pf // 0.15 comb
+  float isocutelecs = 0.17;//999999; //0.3;//0.17;//0.17; //0.17; //0.17;//0.17;
   bool pfIso = true;
-  float leptontype = 1; // 1 muon -1 electron
+  //  float leptontype = 1; // 1 muon -1 electron
   bool oppocharge=true;
   float globalElecEnergyScale=1.0;
   //if(DataType == "ee_200rereco.root" || DataType == "ee_800prompt.root" ) globalElecEnergyScale=1.005; //just play around
@@ -298,8 +321,8 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
 
   float tempiso=100;
 
-  std::vector<float> VLepPt;
-  std::vector<float> VLepEta, VLepPhi, VLepE, VLepPx, VLepPy, VLepPz, VLepPfIso, VLepCombIso;
+  std::vector<double> VLepPt;
+  std::vector<double> VLepEta, VLepPhi, VLepE, VLepPx, VLepPy, VLepPz, VLepPfIso, VLepCombIso;
   std::vector<int> VLepQ, VLepType;
  
 
@@ -356,7 +379,7 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
 
 
 
-  //PUweight=1;
+  PUweight=1;
 
 
 
@@ -373,11 +396,12 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
       
     if((VLepType[0] == 1 &&  VLepType[1] == -1 )||(VLepType[0] == -1 &&  VLepType[1] == 1 ) ) b_step2=true;
     if(dimass > 12)                     b_step3=true;
-    if((dimass < 76.0 || dimass > 106.0))     b_step4=true; //dimass > 50 && 
+    //   if((dimass < 76.0 || dimass > 106.0))     b_step4=true; //dimass > 50 &&  
     b_step4=true; //no cut on Z in emu
     if(jetMulti>0)                      b_step5=true;
     if(jetMulti>1)                      b_step6=true;
     if(*(metEt->begin()) > 30)          b_step7=true;
+    b_step7=true;
 
   }
 
@@ -391,9 +415,74 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
     if(*ajetTCHE > btagWP) btagmulti++;
   }
 
-  if(btagmulti > 0) b_step8=true;
+  if(btagmulti > 0 && dimass> llmass) b_step8=true;
   if(btagmultiM > 0) b_step9=true;
 
+
+
+  //Lepton scaling factor selection
+  double lepSF[2]={0.,0.};
+
+  for (int i=0; i<2; i++)
+    {
+      if(VLepType[i]== -1)
+	{
+	  if(20.0<= VLepPt[i] && VLepPt[i] <30.)
+	    {
+	      if (VLepEta[i]<=1.5)     {lepSF[i]=eSF1;}
+	      else if (VLepEta[i]>1.5) {lepSF[i]=eSF5;};
+	    }
+	  else if(30.0<= VLepPt[i] && VLepPt[i] <40.)
+	    {
+	      if (VLepEta[i]<=1.5)     {lepSF[i]=eSF2;}
+	      else if (VLepEta[i]>1.5) {lepSF[i]=eSF6;};
+	    }
+	  else if(40.0<= VLepPt[i] && VLepPt[i] <50.)
+	    {
+	      if (VLepEta[i]<=1.5)     {lepSF[i]=eSF3;}
+	      else if (VLepEta[i]>1.5) {lepSF[i]=eSF7;};
+	    }
+	  else if(50.0<= VLepPt[i])
+	    {
+	      if (VLepEta[i]<=1.5)     {lepSF[i]=eSF4;}
+	      else if (VLepEta[i]>1.5) {lepSF[i]=eSF8;};
+	    };
+	}
+      else if(VLepType[i]== 1)
+	{
+	  if(20.0<= VLepPt[i] && VLepPt[i] <30.)
+	    {
+	      if (VLepEta[i]<=1.5)     {lepSF[i]=muSF1;}
+	      else if (VLepEta[i]>1.5) {lepSF[i]=muSF5;};
+	    }
+	  else if(30.0<= VLepPt[i] && VLepPt[i] <40.)
+	    {
+	      if (VLepEta[i]<=1.5)     {lepSF[i]=muSF2;}
+	      else if (VLepEta[i]>1.5) {lepSF[i]=muSF6;};
+	    }
+	  else if(40.0<= VLepPt[i] && VLepPt[i] <50.)
+	    {
+	      if (VLepEta[i]<=1.5)     {lepSF[i]=muSF3;}
+	      else if (VLepEta[i]>1.5) {lepSF[i]=muSF7;};
+	    }
+	  else if(50.0<= VLepPt[i])
+	    {
+	      if (VLepEta[i]<=1.5)     {lepSF[i]=muSF4;}
+	      else if (VLepEta[i]>1.5) {lepSF[i]=muSF8;};
+	    };
+	 };    
+    };
+
+
+
+  bool STEP1=0;
+  bool STEP2=0;
+  bool STEP3=0;
+  bool STEP4=0;
+  bool STEP5=0;
+  bool STEP6=0;
+  bool STEP7=0;
+  bool STEP8=0;
 
 
 
@@ -407,17 +496,23 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
     h_PfIso1.    fill(DataType,VLepPfIso , PUweight);
     h_combIso1.  fill(DataType,VLepCombIso , PUweight);
     c_step1.fill(DataType, PUweight);
+    
+    STEP1=1;
 
   }
-  if (b_step1 && b_step2) c_step2.fill(DataType, PUweight);
+  if (b_step1 && b_step2) {c_step2.fill(DataType, PUweight);  STEP2=1;};
   
 
   
-  std::vector<TString> samples;
-  samples.push_back("mumu_dymumu1020.root");
+  std::vector<TString> samples;//only used below for MC rescaling
+  samples.push_back("mumu_dymumu1020.root");  //why MuMu samples and NOT EMu samples?
   samples.push_back("mumu_dymumu2050.root");
   samples.push_back("mumu_dymumu50inf.root");
 
+
+
+ //MC reweighting: Lept SF, Trigger SF, BTag SF
+  if (!isData) PUweight=PUweight*lepSF[0]*lepSF[1]*triggSF*btagSF;
 
 
 
@@ -439,6 +534,8 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
     if(VLepEta[0] < 1.79 && VLepEta[1] < 1.79) h_testplotter.  fill(DataType, dimass,  PUweight);
     else if(VLepEta[0] > 1.79 && VLepEta[1] > 1.79) h_testplotter2.  fill(DataType, dimass,  PUweight);
 
+
+     STEP3=1;
   }
 
 
@@ -470,6 +567,8 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
       h_jetMulti4.fill(DataType, jetMulti , PUweight);
       h_metEt4.   fill(DataType, *metEt ,   PUweight);
       h_btagN4.   fill(DataType, btagmulti ,PUweight);
+
+      STEP4=1;
     }
   }
   
@@ -486,6 +585,8 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
       h_jetMulti5.fill(DataType, jetMulti , PUweight);
       h_metEt5.   fill(DataType, *metEt ,   PUweight);
       h_btagN5.   fill(DataType, btagmulti ,PUweight);
+
+      STEP5=1;
     }
   }
 
@@ -510,6 +611,8 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
       h_jetMulti6.fill(DataType, jetMulti , PUweight);
       h_metEt6.   fill(DataType, *metEt ,   PUweight);
       h_btagN6.   fill(DataType, btagmulti ,PUweight);
+
+      STEP6=1;
     }
   }
  
@@ -526,10 +629,32 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
       h_jetMulti7.fill(DataType, jetMulti , PUweight);
       h_metEt7.   fill(DataType, *metEt ,   PUweight);
       h_btagN7.   fill(DataType, btagmulti ,PUweight);
+
+      STEP7=1;
+
     }
   }
  
   if(b_step1 && b_step2 && b_step3 && b_step5 && b_step6 && b_step7 && b_step8){
+    /*
+  std::cout <<"================================================================"<<std::endl;
+  std::cout <<"Event Number = "<< eventNumber<<std::endl;
+  std::cout <<"-----------------------------------------------------"<<std::endl;
+  std::cout <<"Lepton 0:"<<std::endl;
+  std::cout <<"Lepton type (1=muon, -1=electron)="<<VLepType[0]<<std::endl;
+  std::cout <<"(px, py, pz, E) = ("<< VLepPx[0]<<" , "<<VLepPy[0]<<" , "<<VLepPz[0]<<" , "<<VLepE[0]<<")"<<std::endl;
+  std::cout <<"p_T = "<<VLepPt[0]<<std::endl;
+  std::cout <<"Lepton Charge = "<<VLepQ[0]<<std::endl;
+  std::cout <<"Particle Flow Isolation (I_e<0.20, I_mu<0.17) = "<< VLepPfIso[0]<<std::endl;
+  std::cout <<"-----------------------------------------------------"<<std::endl;
+  std::cout <<"Lepton 1"<<std::endl;
+  std::cout <<"Lepton type (1=muon, -1=electron)="<<VLepType[1]<<std::endl;
+  std::cout <<"(px, py, pz, E) = ("<< VLepPx[1]<<" , "<<VLepPy[1]<<" , "<<VLepPz[1]<<" , "<<VLepE[1]<<")"<<std::endl;
+  std::cout <<"p_T = "<<VLepPt[1]<<std::endl;
+  std::cout <<"Lepton Charge = "<<VLepQ[1]<<std::endl;
+  std::cout <<"Particle Flow Isolation (I_e<0.20, I_mu<0.17) = "<< VLepPfIso[1]<<std::endl;
+
+    */
     h_diMassZ8.  fill(DataType, dimass,  PUweight);
     if(b_step4){
     c_step8.fill(DataType, PUweight);
@@ -542,6 +667,9 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
     h_jetMulti8.fill(DataType, jetMulti , PUweight);
     h_metEt8.   fill(DataType, *metEt ,   PUweight);
     h_btagN8.   fill(DataType, btagmulti ,PUweight);
+
+    STEP8=1;
+
     }
   }
 
@@ -551,7 +679,37 @@ Bool_t EMuAnalysis::Process(Long64_t entry)
 
   }
 
+  /*
+  if ( (int)totalEventCount%250==0 )
+    {
+  std::cout <<"================================================================"<<std::endl;
+  std::cout <<"Event Number = "<< eventNumber<<std::endl;
+  std::cout <<"-----------------------------------------------------"<<std::endl;
+  std::cout <<"Lepton 0:"<<std::endl;
+  std::cout <<"Lepton type (1=muon, -1=electron)="<<VLepType[0]<<std::endl;
+  std::cout <<"(px, py, pz, E) = ("<< VLepPx[0]<<" , "<<VLepPy[0]<<" , "<<VLepPz[0]<<" , "<<VLepE[0]<<")"<<std::endl;
+  std::cout <<"p_T = "<<VLepPt[0]<<std::endl;
+  std::cout <<"Lepton Charge = "<<VLepQ[0]<<std::endl;
+  std::cout <<"Particle Flow Isolation (I_e<0.20, I_mu<0.17) = "<< VLepPfIso[0]<<std::endl;
+  std::cout <<"-----------------------------------------------------"<<std::endl;
+  std::cout <<"Lepton 1"<<std::endl;
+  std::cout <<"Lepton type (1=muon, -1=electron)="<<VLepType[1]<<std::endl;
+  std::cout <<"(px, py, pz, E) = ("<< VLepPx[1]<<" , "<<VLepPy[1]<<" , "<<VLepPz[1]<<" , "<<VLepE[1]<<")"<<std::endl;
+  std::cout <<"p_T = "<<VLepPt[1]<<std::endl;
+  std::cout <<"Lepton Charge = "<<VLepQ[1]<<std::endl;
+  std::cout <<"Particle Flow Isolation (I_e<0.20, I_mu<0.17) = "<< VLepPfIso[1]<<std::endl;
+  std::cout <<"******************************************************"<< std::endl;
+  std::cout <<"step1: "<<b_step1<<" STEP1= "<<STEP1<<std::endl;
+  std::cout <<"step2: "<<b_step2<<" STEP2= "<<STEP2<<std::endl;
+  std::cout <<"step3: "<<b_step3<<" STEP3= "<<STEP3<<std::endl;
+  std::cout <<"step4: "<<b_step4<<" STEP4= "<<STEP4<<std::endl;
+  std::cout <<"step5: "<<b_step5<<" STEP5= "<<STEP5<<std::endl;
+  std::cout <<"step6: "<<b_step6<<" STEP6= "<<STEP6<<std::endl;
+  std::cout <<"step7: "<<b_step7<<" STEP7= "<<STEP7<<std::endl;
+  std::cout <<"step8: "<<b_step8<<" STEP8= "<<STEP8<<std::endl;
+    };
 
+  */
 
    return kTRUE;
 }
@@ -569,13 +727,14 @@ void EMuAnalysis::Terminate()
 {
  
  
-  TFile *f = new TFile("EMu_Analysis_rescaled2.root","RECREATE");
+  TFile *f = new TFile("/scratch/hh/current/cms/user/asincruz/NTuples/EMu_AnalysisM12.root","RECREATE");
 
 
 h_testplotter.write();
 h_testplotter2.write();
 
-
+ TDirectory *d0=(TDirectory*)f->mkdir("Step0");
+ d0->cd();
     h_vertMulti0.   write();
   h_lepQ0.write();
   h_combIso0.write();
@@ -590,7 +749,12 @@ h_testplotter2.write();
 
   h_lepMulti1. write();
 
+  d0->Clear();
+  d0->Close();
 
+
+  TDirectory *d3=(TDirectory*)f->mkdir("Step3");
+  d3->cd();
     h_vertMulti3.   write();
   h_diMass3.   write();
   h_lepPt3.    write();
@@ -599,8 +763,11 @@ h_testplotter2.write();
   h_jetMulti3. write();
   h_metEt3.    write();
   h_btagN3.    write();
+  d3->Close();
+  d3->Clear();
 
-
+  TDirectory *d3a=(TDirectory*)f->mkdir("Step3a");
+  d3a->cd();
     h_vertMulti3a.   write();
   h_diMass3a.   write();
   h_lepPt3a.    write();
@@ -609,8 +776,11 @@ h_testplotter2.write();
   h_jetMulti3a. write();
   h_metEt3a.    write();
   h_btagN3a.    write();
+  d3a->Close();
+  d3a->Clear();
 
-
+  TDirectory *d4=(TDirectory*)f->mkdir("Step4");
+  d4->cd();
     h_vertMulti4.   write();
   h_diMass4.   write();
   h_lepPt4.    write();
@@ -619,7 +789,11 @@ h_testplotter2.write();
   h_jetMulti4. write();
   h_metEt4.    write();
   h_btagN4.    write();
+  d4->Close();
+  d4->Clear();
 
+   TDirectory *d5=(TDirectory*)f->mkdir("Step5");
+   d5->cd();
     h_vertMulti5.   write();
   h_diMass5.   write();
   h_lepPt5.    write();
@@ -628,7 +802,11 @@ h_testplotter2.write();
   h_jetMulti5. write();
   h_metEt5.    write();
   h_btagN5.    write();
+  d5->Close();
+  d5->Clear();
 
+  TDirectory *d6=(TDirectory*)f->mkdir("Step6");
+  d6->cd();
     h_vertMulti6.   write();
   h_diMass6.   write();
   h_lepPt6.    write();
@@ -637,7 +815,11 @@ h_testplotter2.write();
   h_jetMulti6. write();
   h_metEt6.    write();
   h_btagN6.    write();
+  d6->Close();
+  d6->Clear();
 
+  TDirectory *d7=(TDirectory*)f->mkdir("Step7");
+  d7->cd();
     h_vertMulti7.   write();
   h_diMass7.   write();
   h_lepPt7.    write();
@@ -646,7 +828,11 @@ h_testplotter2.write();
   h_jetMulti7. write();
   h_metEt7.    write();
   h_btagN7.    write();
+  d7->Close();
+  d7->Clear();
 
+  TDirectory *d8=(TDirectory*)f->mkdir("Step8");
+  d8->cd();
     h_vertMulti8.   write();
   h_diMass8.   write();
   h_lepPt8.    write();
@@ -655,13 +841,18 @@ h_testplotter2.write();
   h_jetMulti8. write();
   h_metEt8.    write();
   h_btagN8.    write();
+  d8->Close();
+  d8->Clear();
 
+  TDirectory *dpk=(TDirectory*)f->mkdir("DYPeak");
+  dpk->cd();
   h_diMassZ4.  write();
   h_diMassZ5.  write();
   h_diMassZ6.  write();
   h_diMassZ7.  write();
   h_diMassZ8.  write();
-
+  dpk->Close();
+  dpk->Clear();
 
   c_step0.coutNs();
 
@@ -680,7 +871,7 @@ h_testplotter2.write();
   c_step9.coutNsig("t#bar{t} signal");
 
 
-  std::cout << testcounter << std::endl;
+  std::cout <<"Number of total events processed = "<<  testcounter << std::endl;
 
   f->Close();
 
